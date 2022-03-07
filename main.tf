@@ -52,10 +52,10 @@ module "f5xc" {
 }
  
 module "virtualk8s" {
-  source = "./module/f5xc"
+  source = "./module/virtualk8s"
   providers = {
-    app     = kubectl.app
-    utility = kubectl.utility
+    kubectl.app     = kubectl.app
+    kubectl.utility = kubectl.utility
   }
  
   reg_server = var.registry_server

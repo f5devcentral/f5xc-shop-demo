@@ -1,15 +1,10 @@
 terraform {
   required_providers {
-    app = {
+    kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
-      configuration_aliases = [kubectl.app]
+      configuration_aliases = [kubectl.app, kubectl.utility]
     }    
-    utility = {
-      source  = "gavinbunney/kubectl"
-      version = ">= 1.7.0"
-      configuration_aliases = [kubectl.utility]
-    }
   }
 }
 
