@@ -13,7 +13,6 @@ data "app_documents" "manifests" {
 }
 
 resource "kubectl_manifest" "manifests" {
-    provider  = kubectl.app
     count     = length(data.app_documents.manifests.documents)
     yaml_body = element(data.app_documents.manifests.documents, count.index)
     override_namespace = var.namespace

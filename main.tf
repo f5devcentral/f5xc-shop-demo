@@ -22,13 +22,13 @@ provider "volterra" {
   url          = var.api_url
 }
 
-provider "kubectl" {
+provider "gavinbunney/kubectl" {
   alias       = "app"
   config_path = module.volterra.app-kubecfg
   apply_retry_count = 2
 }
 
-provider "kubectl" {
+provider "gavinbunney/kubectl" {
   alias       = "utility"
   config_path = module.volterra.utility-kubecfg
   apply_retry_count = 2
@@ -50,6 +50,9 @@ module "volterra" {
  
 module "app-kubectl" {
   source = "./modules/app-kubectl"
+  providers = {
+    kubectl = kubectl.app
+  }
 
   reg_server = var.registry_server
   reg_password_b64 = base64encode(var.registry_password)
@@ -65,6 +68,9 @@ module "app-kubectl" {
 
 module "utility-kubectl" {
   source = "./modules/utility-kubectl"
+  providers = {
+      kubectl = kubectl.utility
+    }
 
   reg_server = var.registry_server
   reg_password_b64 = base64encode(var.registry_password)
