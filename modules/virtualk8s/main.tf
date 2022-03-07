@@ -38,7 +38,7 @@ resource "kubectl_manifest" "app-resources" {
     provider  = kubectl.app
     count     = length(data.kubectl_path_documents.app-manifests.documents)
     yaml_body = element(data.kubectl_path_documents.app-manifests.documents, count.index)
-    override_namespace = var.namespace
+    override_namespace = var.app_namespace
 }
 
 resource "kubectl_manifest" "utility-resources" {
