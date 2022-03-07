@@ -29,11 +29,13 @@ output "utility_vsite" {
 }
 
 output "app_kubecfg" {
-  description = "kubeconfig file for app vk8s"
-  value       = local_file.app_kubeconfig
+  description = "kubeconfig for app vk8s"
+  value       = base64decode(volterra_api_credential.app_vk8s_cred.data)
+  sensitive   = true
 }
 
 output "utility_kubecfg" {
-  description = "kubeconfig file for utility vk8s"
-  value       = local_file.utility_kubeconfig
+  description = "kubeconfig for utility vk8s"
+  value       = base64decode(volterra_api_credential.utility_vk8s_cred.data)
+  sensitive   = true
 }
