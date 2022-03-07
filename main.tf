@@ -14,7 +14,7 @@ terraform {
 
 resource "local_file" "cred" {
     content_base64 = var.ves_cred
-    filename       = "${path.module}/cred.p12"
+    filename       = "${path.module}/module/f5xc/cred.p12"
 }
 
 provider "volterra" {
@@ -34,13 +34,16 @@ provider "kubectl" {
   apply_retry_count = 2
 }
 
-module "volterra" {
-  source = "./modules/volterra"
+module "f5xc" {
+  source = "./module/f5xc"
+  depends_on = [
+    local_file.cred
+  ]
 
   base = var.base
   app_fqdn = var.app_fqdn
   api_url = var.api_url
-  api_p12_file = "${path.module}/../cred.p12"
+  api_p12_file = "${path.module}/cred.p12" //ensure this is present on all runs?
   spoke_site_selector = var.spoke_site_selector
   hub_site_selector = var.hub_site_selector
   utility_site_selector = var.utility_site_selector
@@ -49,7 +52,7 @@ module "volterra" {
 }
  
 module "virtualk8s" {
-  source = "./modules/virtualk8s"
+  source = "./module/f5xc"
   providers = {
     kubectl.app    = kubectl.app
     kubectl.utility = kubectl.utility
