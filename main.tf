@@ -50,10 +50,7 @@ module "volterra" {
  
 module "app-kubectl" {
   source = "./modules/app-kubectl"
-  providers = {
-    kubectl = kubectl.app
-  }
-
+ 
   reg_server = var.registry_server
   reg_password_b64 = base64encode(var.registry_password)
   reg_server_b64 = base64encode(var.registry_server)
@@ -68,9 +65,6 @@ module "app-kubectl" {
 
 module "utility-kubectl" {
   source = "./modules/utility-kubectl"
-  providers = {
-      kubectl = kubectl.utility
-    }
 
   reg_server = var.registry_server
   reg_password_b64 = base64encode(var.registry_password)
