@@ -24,13 +24,13 @@ provider "volterra" {
 
 provider "kubectl" {
   alias = "app"
-  config_path = module.volterra.app-kubecfg
+  config_path = module.volterra.app_kubecfg
   apply_retry_count = 2
 }
 
 provider "kubectl" {
   alias = "utility"
-  config_path = module.volterra.utility-kubecfg
+  config_path = module.volterra.utility_kubecfg
   apply_retry_count = 2
 }
 

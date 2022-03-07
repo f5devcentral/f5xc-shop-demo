@@ -11,7 +11,7 @@ terraform {
 data "kubectl_path_documents" "app-manifests" {
     pattern = "${path.module}/app-manifests/*.yaml"
     vars = {
-        namespace = var.namespace,
+        namespace = var.app_namespace,
         spoke_vsite = var.spoke_vsite,
         hub_vsite = var.hub_vsite,
         reg_password_b64 = var.reg_password_b64,

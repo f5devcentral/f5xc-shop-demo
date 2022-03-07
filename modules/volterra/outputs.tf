@@ -28,7 +28,7 @@ output "utility_vsite" {
   value       = volterra_virtual_site.utility.name
 }
 
-output "app-kubecfg" {
+output "app_kubecfg" {
   description = "kubeconfig file"
   value       = local_file.kubeconfig
 }
