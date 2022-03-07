@@ -21,8 +21,8 @@ provider "kubectl" {
   alias                  = "app"
   host                   = yamldecode(module.f5xc.app_kubecfg)["clusters"][0]["cluster"]["server"]
   cluster_ca_certificate = yamldecode(module.f5xc.app_kubecfg)["clusters"][0]["cluster"]["certificate-authority-data"]
-  client_certificate     = yamldecode(module.f5xc.app_kubecfg)["user"][0]["user"]["client-certificate-data"]
-  client_key             = yamldecode(module.f5xc.app_kubecfg)["user"][0]["user"]["client-key-data"]
+  client_certificate     = yamldecode(module.f5xc.app_kubecfg)["users"][0]["user"]["client-certificate-data"]
+  client_key             = yamldecode(module.f5xc.app_kubecfg)["users"][0]["user"]["client-key-data"]
   load_config_file       = false
 }
 
@@ -30,8 +30,8 @@ provider "kubectl" {
   alias                  = "utility"
   host                   = yamldecode(module.f5xc.utility_kubecfg)["clusters"][0]["cluster"]["server"]
   cluster_ca_certificate = yamldecode(module.f5xc.utility_kubecfg)["clusters"][0]["cluster"]["certificate-authority-data"]
-  client_certificate     = yamldecode(module.f5xc.utility_kubecfg)["user"][0]["user"]["client-certificate-data"]
-  client_key             = yamldecode(module.f5xc.utility_kubecfg)["user"][0]["user"]["client-key-data"]
+  client_certificate     = yamldecode(module.f5xc.utility_kubecfg)["users"][0]["user"]["client-certificate-data"]
+  client_key             = yamldecode(module.f5xc.utility_kubecfg)["users"][0]["user"]["client-key-data"]
   load_config_file       = false
 }
 
