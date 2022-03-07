@@ -52,7 +52,7 @@ module "virtualk8s" {
   source = "./modules/virtualk8s"
   providers = {
     kubectl.app    = kubectl.app
-    kubectl.utilty = kubectl.utility
+    kubectl.utility = kubectl.utility
   }
  
   reg_server = var.registry_server
