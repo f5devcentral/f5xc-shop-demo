@@ -34,8 +34,8 @@ module "f5xc" {
 
   base = var.base
   app_fqdn = var.app_fqdn
-  api_url = var.api_url
-  api_p12_file = "${path.module}/cred.p12" //ensure this is present on all runs?
+  //api_url = var.api_url
+  //api_p12_file = "${path.module}/cred.p12" //ensure this is present on all runs?
   spoke_site_selector = var.spoke_site_selector
   hub_site_selector = var.hub_site_selector
   utility_site_selector = var.utility_site_selector
