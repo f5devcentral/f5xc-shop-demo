@@ -114,7 +114,7 @@ resource "volterra_api_credential" "app_vk8s_cred" {
       "pip -r requirements.txt && python credDestroy.py --p12 %s --api %s --cred %s",
       "../cred.p12",
       var.api_url,
-      volterra_api_credential.app_vk8s_cred.id,
+      self.id,
     )
     working_dir = "${path.module}/../helpers"
   }
@@ -134,7 +134,7 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
       "pip -r requirements.txt && python credDestroy.py --p12 %s --api %s --cred %s",
       "../cred.p12",
       var.api_url,
-      volterra_api_credential.utility_vk8s_cred.id,
+      self.id,
     )
     working_dir = "${path.module}/../helpers"
   }
