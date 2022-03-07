@@ -55,7 +55,7 @@ module "virtualk8s" {
   }
  
   reg_server = var.registry_server
-  reg_password_b64 = base64encode(var.registry_password)
+  reg_password_b64 = var.registry_password
   reg_server_b64 = base64encode(var.registry_server)
   reg_username_b64 = base64encode(var.registry_username)
 
