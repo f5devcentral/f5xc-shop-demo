@@ -18,15 +18,21 @@ provider "volterra" {
 }
 
 provider "kubectl" {
-  alias = "app"
-  config_path = module.f5xc.app_kubecfg
-  apply_retry_count = 2
+  alias                  = "app"
+  host                   = yamldecode(module.f5xc.app_kubecfg)["clusters"][0]["cluster"]["server"]
+  cluster_ca_certificate = yamldecode(module.f5xc.app_kubecfg)["clusters"][0]["cluster"]["certificate-authority-data"]
+  client_certificate     = yamldecode(module.f5xc.app_kubecfg)["user"][0]["user"]["client-certificate-data"]
+  client_key             = yamldecode(module.f5xc.app_kubecfg)["user"][0]["user"]["client-key-data"]
+  load_config_file       = false
 }
 
 provider "kubectl" {
-  alias = "utility"
-  config_path = module.f5xc.utility_kubecfg
-  apply_retry_count = 2
+  alias                  = "utility"
+  host                   = yamldecode(module.f5xc.utility_kubecfg)["clusters"][0]["cluster"]["server"]
+  cluster_ca_certificate = yamldecode(module.f5xc.utility_kubecfg)["clusters"][0]["cluster"]["certificate-authority-data"]
+  client_certificate     = yamldecode(module.f5xc.utility_kubecfg)["user"][0]["user"]["client-certificate-data"]
+  client_key             = yamldecode(module.f5xc.utility_kubecfg)["user"][0]["user"]["client-key-data"]
+  load_config_file       = false
 }
 
 module "f5xc" {

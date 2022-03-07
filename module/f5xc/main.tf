@@ -100,7 +100,7 @@ resource "time_sleep" "utility_vk8s_wait" {
   create_duration = "120s"
 }
 
-resource "volterra_api_credential" "vk8s_cred" {
+resource "volterra_api_credential" "app_vk8s_cred" {
   name      = format("%s-api-cred", var.base)
   api_credential_type = "KUBE_CONFIG"
   virtual_k8s_namespace = volterra_namespace.ns.name
@@ -116,16 +116,6 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
   virtual_k8s_name = volterra_virtual_k8s.utility_vk8s.name
   expiry_days = var.cred_expiry_days
   depends_on = [time_sleep.utility_vk8s_wait]
-}
-
-resource "local_file" "app_kubeconfig" {
-    content = base64decode(volterra_api_credential.vk8s_cred.data)
-    filename = format("${path.module}/../../misc/%s-app-vk8s.yaml", terraform.workspace)
-}
-
-resource "local_file" "utility_kubeconfig" {
-    content = base64decode(volterra_api_credential.utility_vk8s_cred.data)
-    filename = format("${path.module}/../../misc/%s-utility-vk8s.yaml", terraform.workspace)
 }
 
 resource "volterra_app_type" "at" {
