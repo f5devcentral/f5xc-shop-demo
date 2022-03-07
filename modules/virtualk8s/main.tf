@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
+      configuration_aliases = [ kubectl.app, kubectl.utility ]
+    }
+  }
+}
+
 data "kubectl_path_documents" "app-manifests" {
     pattern = "${path.module}/app-manifests/*.yaml"
     vars = {
@@ -25,14 +35,14 @@ data "kubectl_path_documents" "utility-manifests" {
     }
 }
 resource "kubectl_manifest" "app-resources" {
-    provider  = app-kubectl
+    provider  = kubectl.app
     count     = length(data.kubectl_path_documents.app-manifests.documents)
     yaml_body = element(data.kubectl_path_documents.app-manifests.documents, count.index)
     override_namespace = var.namespace
 }
 
 resource "kubectl_manifest" "utility-resources" {
-    provider  = utility-kubectl
+    provider  = kubectl.utility
     count     = length(data.kubectl_path_documents.utility-manifests.documents)
     yaml_body = element(data.kubectl_path_documents.utility-manifests.documents, count.index)
     override_namespace = var.utility_namespace
