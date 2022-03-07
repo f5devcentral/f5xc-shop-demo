@@ -19,19 +19,19 @@ provider "volterra" {
 
 provider "kubectl" {
   alias                  = "app"
-  host                   = yamldecode(module.f5xc.app_kubecfg)["clusters"][0]["cluster"]["server"]
-  cluster_ca_certificate = yamldecode(module.f5xc.app_kubecfg)["clusters"][0]["cluster"]["certificate-authority-data"]
-  client_certificate     = yamldecode(module.f5xc.app_kubecfg)["users"][0]["user"]["client-certificate-data"]
-  client_key             = yamldecode(module.f5xc.app_kubecfg)["users"][0]["user"]["client-key-data"]
+  host                   = module.f5xc.app_kubecfg_host
+  cluster_ca_certificate = module.f5xc.app_kubecfg_cluster_ca
+  client_certificate     = module.f5xc.app_kubecfg_client_cert
+  client_key             = module.f5xc.app_kubecfg_client_key
   load_config_file       = false
 }
 
 provider "kubectl" {
   alias                  = "utility"
-  host                   = yamldecode(module.f5xc.utility_kubecfg)["clusters"][0]["cluster"]["server"]
-  cluster_ca_certificate = yamldecode(module.f5xc.utility_kubecfg)["clusters"][0]["cluster"]["certificate-authority-data"]
-  client_certificate     = yamldecode(module.f5xc.utility_kubecfg)["users"][0]["user"]["client-certificate-data"]
-  client_key             = yamldecode(module.f5xc.utility_kubecfg)["users"][0]["user"]["client-key-data"]
+  host                   = module.f5xc.utility_kubecfg_host
+  cluster_ca_certificate = module.f5xc.utility_kubecfg_cluster_ca
+  client_certificate     = module.f5xc.utility_kubecfg_client_cert
+  client_key             = module.f5xc.utility_kubecfg_client_key
   load_config_file       = false
 }
 
