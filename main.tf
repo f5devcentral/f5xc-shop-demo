@@ -34,8 +34,6 @@ module "f5xc" {
 
   base = var.base
   app_fqdn = var.app_fqdn
-  //api_url = var.api_url
-  //api_p12_file = "${path.module}/cred.p12" //ensure this is present on all runs?
   spoke_site_selector = var.spoke_site_selector
   hub_site_selector = var.hub_site_selector
   utility_site_selector = var.utility_site_selector
@@ -55,7 +53,7 @@ module "virtualk8s" {
   reg_server_b64 = base64encode(var.registry_server)
   reg_username_b64 = base64encode(var.registry_username)
 
-  app_namespace = module.f5xc.namespace
+  app_namespace = module.f5xc.app_namespace
   utility_namespace = module.f5xc.utility_namespace
   spoke_vsite = module.f5xc.spoke_vsite
   hub_vsite = module.f5xc.hub_vsite

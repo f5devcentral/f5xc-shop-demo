@@ -3,7 +3,7 @@ output "app_url" {
   value       = format("https://%s", var.app_fqdn)
 }
 
-output "namespace" {
+output "app_namespace" {
   description = "Namespace created for this app"
   value       = volterra_namespace.ns.name
 }
@@ -29,8 +29,8 @@ output "utility_vsite" {
 }
 
 output "app_kubecfg" {
-  description = "kubeconfig file"
-  value       = local_file.kubeconfig
+  description = "kubeconfig file for app vk8s"
+  value       = local_file.app_kubeconfig
 }
 
 output "utility_kubecfg" {
