@@ -1,0 +1,37 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: shop-traffic-gen
+  annotations:
+    ves.io/virtual-sites: ${utility_namespace}/${utility_vsite}
+spec:
+  schedule: "*/6 * * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            ves.io/workload-flavor: tiny
+            ves.io/virtual-sites: ${utility_namespace}/${utility_vsite}
+        spec:
+          containers:
+            - name: volt-traffic-gen
+              image: ${reg_server}/volt-traffic-gen
+              env:
+                - name: DURATION
+                  value: 5m
+                - name: TARGET_URL
+                  value: ${target_url}
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: Always
+          restartPolicy: OnFailure
+          backoffLimit: 1
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: {}
+          imagePullSecrets:
+            - name: registry-secret

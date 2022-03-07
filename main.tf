@@ -48,32 +48,24 @@ module "volterra" {
   bot_defense_region = var.bot_defense_region
 }
  
-module "app-kubectl" {
-  source = "./modules/app-kubectl"
+module "virtualk8s" {
+  source = "./modules/virtualk8s"
+  providers = {
+    kubectl.app = kubectl.app
+    kubectl.utility = kubectl.utility
+  }
  
   reg_server = var.registry_server
   reg_password_b64 = base64encode(var.registry_password)
   reg_server_b64 = base64encode(var.registry_server)
   reg_username_b64 = base64encode(var.registry_username)
 
-  namespace = module.volterra.namespace
+  app_namespace = module.volterra.namespace
+  utility_namespace = module.volterra.utility_namespace
   spoke_vsite = module.volterra.spoke_vsite
   hub_vsite = module.volterra.hub_vsite
+  utility_vsite = module.volterra.utility_vsite
+  target_url = module.volterra.app_url
 
   tenant_js_ref = var.tenant_js_ref
-}
-
-module "utility-kubectl" {
-  source = "./modules/utility-kubectl"
-
-  reg_server = var.registry_server
-  reg_password_b64 = base64encode(var.registry_password)
-  reg_server_b64 = base64encode(var.registry_server)
-  reg_username_b64 = base64encode(var.registry_username)
-
-  utility_namespace = module.volterra.utility_namespace
-  utility_vsite = module.volterra.utility_vsite
-  
-  
-  target_url = module.volterra.app_url
 }
