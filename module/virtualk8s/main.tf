@@ -1,9 +1,11 @@
-provider "kubectl" {
-  alias = "app"
-}
-
-provider "kubectl" {
-  alias = "utility"
+terraform {
+  required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
+      configuration_aliases = [kubectl.app, kubectl.utility]
+    }
+  }
 }
 
 data "kubectl_path_documents" "app-manifests" {
