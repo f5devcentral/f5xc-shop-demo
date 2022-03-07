@@ -10,16 +10,13 @@ variable "reg_server_b64" {
 variable "reg_username_b64" {
 }
 
-variable "namespace" {
+variable "app_namespace" {
 }
 
 variable "spoke_vsite" {
 }
 
 variable "hub_vsite" {
-}
-
-variable "kubecfg" {
 }
 
 variable "tenant_js_ref" {
@@ -29,9 +26,6 @@ variable "utility_namespace" {
 }
 
 variable "utility_vsite" {
-}
-
-variable "utility_kubecfg" {
 }
 
 variable "target_url" {
