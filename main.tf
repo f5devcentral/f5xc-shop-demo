@@ -40,6 +40,7 @@ provider "kubectl" {
 module "f5xc" {
   source = "./module/f5xc"
 
+  api_url = var.api_url
   base = var.base
   app_fqdn = var.app_fqdn
   spoke_site_selector = var.spoke_site_selector
