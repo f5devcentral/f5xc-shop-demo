@@ -1,12 +1,4 @@
-provider "kubectl" {
-    alias = "app"
-}
-
-provider "kubectl" {
-    alias = "utility"
-}
-
-data "app_documents" "manifests" {
+data "kubectl_path_documents" "app-manifests" {
     pattern = "${path.module}/app-manifests/*.yaml"
     vars = {
         namespace = var.namespace,
@@ -20,7 +12,7 @@ data "app_documents" "manifests" {
     }
 }
 
-data "utility_documents" "manifests" {
+data "kubectl_path_documents" "utility-manifests" {
     pattern = "${path.module}/utility-manifests/*.yaml"
     vars = {
         utility_namespace = var.utility_namespace,
@@ -32,16 +24,16 @@ data "utility_documents" "manifests" {
         target_url = var.target_url
     }
 }
-resource "kubectl_manifest" "manifests" {
+resource "kubectl_manifest" "app-resources" {
     provider  = kubectl.app
-    count     = length(data.app_documents.manifests.documents)
-    yaml_body = element(data.app_documents.manifests.documents, count.index)
+    count     = length(data.kubectl_path_documents.app-manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.app-manifests.documents, count.index)
     override_namespace = var.namespace
 }
 
-resource "kubectl_manifest" "manifests" {
+resource "kubectl_manifest" "utility-resources" {
     provider  = kubectl.utility
-    count     = length(data.utility_documents.manifests.documents)
-    yaml_body = element(data.utiltity_documents.manifests.documents, count.index)
+    count     = length(data.kubectl_path_documents.utility-manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.utility-manifests.documents, count.index)
     override_namespace = var.utility_namespace
 }

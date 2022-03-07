@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.13"
+  required_version = ">= 0.15"
   required_providers {
     volterra = {
       source = "volterraedge/volterra"
@@ -8,6 +8,7 @@ terraform {
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
+      configuration_aliases = [ kubectl.app, kubectl.utility ]
     }
   }
 }
