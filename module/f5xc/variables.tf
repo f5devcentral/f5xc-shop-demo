@@ -1,6 +1,9 @@
 variable "base" {
 }
 
+variable "api_url" {
+}
+
 variable "app_fqdn" {
 }
 

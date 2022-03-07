@@ -107,6 +107,17 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   virtual_k8s_name = volterra_virtual_k8s.vk8s.name
   expiry_days = var.cred_expiry_days
   depends_on = [time_sleep.vk8s_wait]
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = format(
+      "pip -r requirements.txt && python credDestroy.py --p12 %s --api %s --cred %s",
+      "../cred.p12",
+      var.api_url,
+      volterra_api_credential.app_vk8s_cred.id,
+    )
+    working_dir = "${path.module}/../helpers"
+  }
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
@@ -116,6 +127,17 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
   virtual_k8s_name = volterra_virtual_k8s.utility_vk8s.name
   expiry_days = var.cred_expiry_days
   depends_on = [time_sleep.utility_vk8s_wait]
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = format(
+      "pip -r requirements.txt && python credDestroy.py --p12 %s --api %s --cred %s",
+      "../cred.p12",
+      var.api_url,
+      volterra_api_credential.utility_vk8s_cred.id,
+    )
+    working_dir = "${path.module}/../helpers"
+  }
 }
 
 resource "volterra_app_type" "at" {
