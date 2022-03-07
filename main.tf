@@ -4,7 +4,7 @@ terraform {
 
 resource "local_file" "cred" {
     content_base64 = var.ves_cred
-    filename       = "${path.module}/../cred/cred.p12"
+    filename       = "${path.module}/cred/cred.p12"
 }
 
 module "volterra" {
@@ -13,7 +13,7 @@ module "volterra" {
   base = var.base
   app_fqdn = var.app_fqdn
   api_url = var.api_url
-  api_p12_file = local_file.cred.filename
+  //api_p12_file = local_file.cred.filename
   spoke_site_selector = var.spoke_site_selector
   hub_site_selector = var.hub_site_selector
   utility_site_selector = var.utility_site_selector

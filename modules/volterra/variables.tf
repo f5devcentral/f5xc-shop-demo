@@ -8,6 +8,7 @@ variable "api_url" {
 }
 
 variable "api_p12_file" {
+    default = "${path.module}/../cred/cred.p12"
 }
 
 variable "spoke_site_selector" {
