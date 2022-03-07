@@ -5,10 +5,13 @@ terraform {
       source = "volterraedge/volterra"
       version = "0.11.3"
     }
-    kubectl = {
+    app-kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
-      configuration_aliases = [ kubectl.app, kubectl.utility ]
+    }
+    utility-kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
     }
   }
 }
@@ -23,14 +26,12 @@ provider "volterra" {
   url          = var.api_url
 }
 
-provider "kubectl" {
-  alias       = "app"
+provider "app-kubectl" {
   config_path = module.volterra.app-kubecfg
   apply_retry_count = 2
 }
 
-provider "kubectl" {
-  alias       = "utility"
+provider "utility-kubectl" {
   config_path = module.volterra.utility-kubecfg
   apply_retry_count = 2
 }
@@ -51,10 +52,6 @@ module "volterra" {
  
 module "virtualk8s" {
   source = "./modules/virtualk8s"
-  providers = {
-    kubectl.app = kubectl.app
-    kubectl.utility = kubectl.utility
-  }
  
   reg_server = var.registry_server
   reg_password_b64 = base64encode(var.registry_password)

@@ -25,14 +25,14 @@ data "kubectl_path_documents" "utility-manifests" {
     }
 }
 resource "kubectl_manifest" "app-resources" {
-    provider  = kubectl.app
+    provider  = app-kubectl
     count     = length(data.kubectl_path_documents.app-manifests.documents)
     yaml_body = element(data.kubectl_path_documents.app-manifests.documents, count.index)
     override_namespace = var.namespace
 }
 
 resource "kubectl_manifest" "utility-resources" {
-    provider  = kubectl.utility
+    provider  = utility-kubectl
     count     = length(data.kubectl_path_documents.utility-manifests.documents)
     yaml_body = element(data.kubectl_path_documents.utility-manifests.documents, count.index)
     override_namespace = var.utility_namespace
