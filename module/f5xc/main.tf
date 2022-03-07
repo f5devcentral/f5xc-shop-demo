@@ -34,7 +34,7 @@ resource "volterra_virtual_site" "spoke" {
   depends_on = [time_sleep.ns_wait]
 
   site_selector {
-    expressions = var.spoke_site_selector
+    expressions = [var.spoke_site_selector]
   }
   site_type = "REGIONAL_EDGE"
 }
@@ -45,7 +45,7 @@ resource "volterra_virtual_site" "hub" {
   depends_on = [time_sleep.ns_wait]
 
   site_selector {
-    expressions = var.hub_site_selector
+    expressions = [var.hub_site_selector]
   }
   site_type = "REGIONAL_EDGE"
 }
@@ -57,7 +57,7 @@ resource "volterra_virtual_site" "utility" {
   depends_on = [time_sleep.ns_utility_wait]
 
   site_selector {
-    expressions = var.utility_site_selector
+    expressions = [var.utility_site_selector]
   }
   site_type = "REGIONAL_EDGE"
 }
