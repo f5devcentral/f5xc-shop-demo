@@ -120,12 +120,12 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
 
 resource "local_file" "app_kubeconfig" {
     content = base64decode(volterra_api_credential.vk8s_cred.data)
-    filename = format("${path.module}/../%s-app-vk8s.yaml", terraform.workspace)
+    filename = format("${path.module}/../../misc/%s-app-vk8s.yaml", terraform.workspace)
 }
 
 resource "local_file" "utility_kubeconfig" {
     content = base64decode(volterra_api_credential.utility_vk8s_cred.data)
-    filename = format("${path.module}/../%s-utility-vk8s.yaml", terraform.workspace)
+    filename = format("${path.module}/../../misc/%s-utility-vk8s.yaml", terraform.workspace)
 }
 
 resource "volterra_app_type" "at" {
@@ -364,8 +364,8 @@ resource "volterra_http_loadbalancer" "frontend" {
   }
   more_option {
     custom_errors = {
-      408 : format("string:///%s", filebase64("${path.module}/../error-page.html")),
-      503 : format("string:///%s", filebase64("${path.module}/../error-page.html"))      
+      408 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html")),
+      503 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html"))      
     }
     idle_timeout = 5000
   }
