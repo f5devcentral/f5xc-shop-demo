@@ -24,6 +24,7 @@ provider "kubectl" {
   client_certificate     = base64decode(module.f5xc.app_kubecfg_client_cert)
   client_key             = base64decode(module.f5xc.app_kubecfg_client_key)
   load_config_file       = false
+  apply_retry_count      = 10
 }
 
 provider "kubectl" {
@@ -33,6 +34,7 @@ provider "kubectl" {
   client_certificate     = base64decode(module.f5xc.utility_kubecfg_client_cert)
   client_key             = base64decode(module.f5xc.utility_kubecfg_client_key)
   load_config_file       = false
+  apply_retry_count      = 10
 }
 
 module "f5xc" {
