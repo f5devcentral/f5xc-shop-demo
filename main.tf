@@ -3,8 +3,8 @@ terraform {
 }
 
 resource "local_file" "cred" {
-    content     = base64decode(var.ves_cred)
-    filename = "${path.module}/../cred.p12"
+    content_base64 = var.ves_cred
+    filename       = "${path.module}/cred.p12"
 }
 
 module "volterra" {
