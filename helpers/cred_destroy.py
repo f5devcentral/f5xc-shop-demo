@@ -28,25 +28,22 @@ def main():
         description='clean up creds on destroy'
     )
     ap.add_argument(
-        '--p12',
-        help='p12 cred file',
-        required=True
-    )
-    ap.add_argument(
-        '--api',
-        help='f5xc api endpoint',
-        required=True
-    )
-    ap.add_argument(
         '--cred',
         help='cred to be revoked (full cred id)',
         required=True
     )
+    ap.add_argument(
+        '--p12',
+        help='p12 cred file',
+        default='../cred.p12'
+        required=False
+    )
     args = ap.parse_args()
     try:
         p12_pass = os.environ.get('VES_P12_PASSWORD')
+        api_url = os.environ.get('VES_API_URL')
         s = getAuthSession(args.api, p12_pass)
-        revokeCred(s, args.tenant, args.cred)
+        revokeCred(s, api_url, args.tenant, args.cred)
     except Exception as e:
         raise e
 
