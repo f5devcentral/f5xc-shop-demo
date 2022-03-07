@@ -3,13 +3,13 @@ terraform {
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
-      configuration_aliases = [app, utility]
+      configuration_aliases = [kubectl.app, kubectl.utility]
     }
   }
 }
 
 data "kubectl_path_documents" "app-manifests" {
-    provider = app
+    provider = kubectl.app
     pattern = "${path.module}/app-manifests/*.yaml"
     vars = {
         namespace = var.app_namespace,
@@ -24,7 +24,7 @@ data "kubectl_path_documents" "app-manifests" {
 }
 
 data "kubectl_path_documents" "utility-manifests" {
-    provider = utility
+    provider = kubectl.utility
     pattern = "${path.module}/utility-manifests/*.yaml"
     vars = {
         utility_namespace = var.utility_namespace,
@@ -37,14 +37,14 @@ data "kubectl_path_documents" "utility-manifests" {
     }
 }
 resource "kubectl_manifest" "app-resources" {
-    provider  = app
+    provider  = kubectl.app
     count     = length(data.kubectl_path_documents.app-manifests.documents)
     yaml_body = element(data.kubectl_path_documents.app-manifests.documents, count.index)
     override_namespace = var.app_namespace
 }
 
 resource "kubectl_manifest" "utility-resources" {
-    provider = utility
+    provider = kubectl.utility
     count     = length(data.kubectl_path_documents.utility-manifests.documents)
     yaml_body = element(data.kubectl_path_documents.utility-manifests.documents, count.index)
     override_namespace = var.utility_namespace
