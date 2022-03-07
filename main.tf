@@ -12,13 +12,8 @@ terraform {
   }
 }
 
-resource "local_file" "cred" {
-    content_base64 = var.ves_cred
-    filename       = "${path.module}/module/f5xc/cred.p12"
-}
-
 provider "volterra" {
-  api_p12_file = local_file.cred.filename
+  api_p12_file = "./cred.p12"
   url          = var.api_url
 }
 
@@ -36,9 +31,6 @@ provider "kubectl" {
 
 module "f5xc" {
   source = "./module/f5xc"
-  depends_on = [
-    local_file.cred
-  ]
 
   base = var.base
   app_fqdn = var.app_fqdn
