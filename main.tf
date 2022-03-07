@@ -22,13 +22,13 @@ provider "volterra" {
   url          = var.api_url
 }
 
-provider "gavinbunney/kubectl" {
+provider "kubectl" {
   alias       = "app"
   config_path = module.volterra.app-kubecfg
   apply_retry_count = 2
 }
 
-provider "gavinbunney/kubectl" {
+provider "kubectl" {
   alias       = "utility"
   config_path = module.volterra.utility-kubecfg
   apply_retry_count = 2
