@@ -110,12 +110,7 @@ resource "volterra_api_credential" "app_vk8s_cred" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = format(
-      "pip -r requirements.txt && python credDestroy.py --p12 %s --api %s --cred %s",
-      "../cred.p12",
-      var.api_url,
-      self.id,
-    )
+    command = format("pip -r requirements.txt && python credDestroy.py --cred %s", self.id)
     working_dir = "${path.module}/../helpers"
   }
 }
@@ -130,12 +125,7 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = format(
-      "pip -r requirements.txt && python credDestroy.py --p12 %s --api %s --cred %s",
-      "../cred.p12",
-      var.api_url,
-      self.id,
-    )
+    command = format("pip -r requirements.txt && python credDestroy.py --p12 %s --api %s --cred %s", self.id)
     working_dir = "${path.module}/../helpers"
   }
 }
