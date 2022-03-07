@@ -24,13 +24,13 @@ provider "volterra" {
 
 provider "kubectl" {
   alias = "app"
-  config_path = module.volterra.app_kubecfg
+  config_path = module.f5xc.app_kubecfg
   apply_retry_count = 2
 }
 
 provider "kubectl" {
   alias = "utility"
-  config_path = module.volterra.utility_kubecfg
+  config_path = module.f5xc.utility_kubecfg
   apply_retry_count = 2
 }
 
@@ -63,12 +63,12 @@ module "virtualk8s" {
   reg_server_b64 = base64encode(var.registry_server)
   reg_username_b64 = base64encode(var.registry_username)
 
-  app_namespace = module.volterra.namespace
-  utility_namespace = module.volterra.utility_namespace
-  spoke_vsite = module.volterra.spoke_vsite
-  hub_vsite = module.volterra.hub_vsite
-  utility_vsite = module.volterra.utility_vsite
-  target_url = module.volterra.app_url
+  app_namespace = module.f5xc.namespace
+  utility_namespace = module.f5xc.utility_namespace
+  spoke_vsite = module.f5xc.spoke_vsite
+  hub_vsite = module.f5xc.hub_vsite
+  utility_vsite = module.f5xc.utility_vsite
+  target_url = module.f5xc.app_url
 
   tenant_js_ref = var.tenant_js_ref
 }
