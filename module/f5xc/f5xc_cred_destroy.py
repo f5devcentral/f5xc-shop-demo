@@ -29,7 +29,7 @@ def main():
     ap.add_argument(
         '--p12',
         help='p12 cred file',
-        default='../cred.p12',
+        default='../../cred.p12',
         required=False
     )
     args = ap.parse_args()
