@@ -10,12 +10,12 @@ def findEndpoint(api: str, resType: str, name: str, namespace: str):
         raise Exception('not a valid resource') #This should never happen
     return url 
 
-@backoff.on_exception(backoff.expo,requests.exceptions.RequestException)
+@backoff.on_exception(backoff.expo,requests.exceptions.RequestException, max_time=60)
 @backoff.on_predicate(
     backoff.constant,
     lambda resp: len(resp['system_metadata']['initializers']['pending']) > 0,
     interval=5,
-    max_time=180
+    max_time=120
 )
 def isResourceReady(s: dict, api: str, resType: str, name: str, namespace: str='none') -> str:
     try:
