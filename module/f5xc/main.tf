@@ -14,6 +14,11 @@ resource "null_resource" "pip" {
   }
 
   provisioner "local-exec" {
+    when    = create
+    command = "pip install -r ${path.module}/requirements.txt"
+  }
+  provisioner "local-exec" {
+    when    = destroy
     command = "pip install -r ${path.module}/requirements.txt"
   }
 }
