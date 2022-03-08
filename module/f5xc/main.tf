@@ -25,7 +25,7 @@ resource "volterra_namespace" "app_ns" {
   provisioner "local-exec" {
     when    = create
     command = format(
-      "python f5xc_resource_ready.py --type ns --name %s",
+      "f5xc_resource_ready.py --type ns --name %s",
        self.name
     )
     working_dir = "${path.module}"
@@ -39,7 +39,7 @@ resource "volterra_namespace" "utility_ns" {
   provisioner "local-exec" {
     when    = create
     command = format(
-      "python f5xc_resource_ready.py --type ns --name %s",
+      "f5xc_resource_ready.py --type ns --name %s",
        self.name
     )
     working_dir = "${path.module}"
@@ -96,7 +96,7 @@ resource "volterra_virtual_k8s" "app_vk8s" {
   provisioner "local-exec" {
     when    = create
     command = format(
-      "python f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
+      "f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
        self.name,
        self.namespace
     )
@@ -119,7 +119,7 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
   provisioner "local-exec" {
     when    = create
     command = format(
-      "python f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
+      "f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
        self.name,
        self.namespace
     )
@@ -137,7 +137,7 @@ resource "volterra_api_credential" "app_vk8s_cred" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = format("python f5xc_cred_destroy.py --cred %s", self.id)
+    command = format("f5xc_cred_destroy.py --cred %s", self.id)
     working_dir = "${path.module}"
   }
   depends_on = [null_resource.pip]
@@ -152,7 +152,7 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
  
   provisioner "local-exec" {
     when    = destroy
-    command = format("python f5xc_cred_destroy.py --cred %s", self.id)
+    command = format("f5xc_cred_destroy.py --cred %s", self.id)
     working_dir = "${path.module}"
   }
   depends_on = [null_resource.pip]

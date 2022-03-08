@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse, os, sys
 from common import getAuthSession
 
