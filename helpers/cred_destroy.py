@@ -1,13 +1,5 @@
-import requests, argparse, os
-from requests_pkcs12 import Pkcs12Adapter
-
-def getAuthSession(p12_file: str, p12_pass: str) -> dict:
-    try:
-        s = requests.Session()
-        s.mount('https://', Pkcs12Adapter(pkcs12_filename=p12_file, pkcs12_password=p12_pass))
-        return s
-    except Exception as e:
-        raise e
+import argparse, os, sys
+from common import getAuthSession
 
 def revokeCred(s: dict, api: str, credID: str, namespace: str='system') -> None:
     try:
@@ -42,7 +34,7 @@ def main():
     try:
         p12_pass = os.environ.get('VES_P12_PASSWORD')
         api_url = os.environ.get('VES_API_URL')
-        s = getAuthSession(args.api, p12_pass)
+        s = getAuthSession(args.p12, p12_pass)
         revokeCred(s, api_url, args.tenant, args.cred)
     except Exception as e:
         raise e
