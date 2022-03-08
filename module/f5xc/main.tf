@@ -17,14 +17,6 @@ resource "null_resource" "pip" {
   }
 }
 
-resource "null_resource" "pip-on-destroy" {
-  provisioner "local-exec" {
-    when    = destroy
-    command = "pip3 install -r ${path.module}/requirements.txt"
-  }
-  depends_on = [volterra_api_credential.app_vk8s_cred,volterra_api_credential.utility_vk8s_cred]
-}
-
 resource "volterra_namespace" "app_ns" {
   name = var.base
 
@@ -123,12 +115,6 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   virtual_k8s_name = volterra_virtual_k8s.app_vk8s.name
   expiry_days = var.cred_expiry_days
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "./f5xc_cred_destroy.py --cred ${self.id}"
-    working_dir = "${path.module}"
-  }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
@@ -138,12 +124,6 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
   virtual_k8s_name = volterra_virtual_k8s.utility_vk8s.name
   expiry_days = var.cred_expiry_days
  
-  provisioner "local-exec" {
-    when    = destroy
-    command = "./f5xc_cred_destroy.py --cred ${self.id}"
-    working_dir = "${path.module}"
-  }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_app_type" "at" {
