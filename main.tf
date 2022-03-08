@@ -56,6 +56,7 @@ module "virtualk8s" {
     kubectl.app     = kubectl.app
     kubectl.utility = kubectl.utility
   }
+  depends_on = [module.f5xc.app_vk8s, module.f5xc.utility_vk8s]
  
   reg_server = var.registry_server
   reg_password_b64 = var.registry_password

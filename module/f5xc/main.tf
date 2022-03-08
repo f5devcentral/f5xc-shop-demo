@@ -95,7 +95,7 @@ resource "volterra_virtual_k8s" "app_vk8s" {
   //https://github.com/volterraedge/terraform-provider-volterra/issues/54
   provisioner "local-exec" {
     when    = create
-    command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --namespace ${self.namespace}"
+    command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
     working_dir = "${path.module}"
   }
   depends_on = [null_resource.pip]
@@ -114,7 +114,7 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
   //https://github.com/volterraedge/terraform-provider-volterra/issues/54
   provisioner "local-exec" {
     when    = create
-    command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --namespace ${self.namespace}"
+    command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
     working_dir = "${path.module}"
   }
   depends_on = [null_resource.pip]
