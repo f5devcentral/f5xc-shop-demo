@@ -17,7 +17,7 @@ resource "volterra_namespace" "app_ns" {
       "pip -r requirements.txt && python f5xc_resource_ready.py --type ns --name %s",
        self.name
     )
-    working_dir = "${path.module}/../helpers"
+    working_dir = "${path.module}"
   }
 }
 
@@ -30,7 +30,7 @@ resource "volterra_namespace" "utility_ns" {
       "pip -r requirements.txt && python f5xc_resource_ready.py --type ns --name %s",
        self.name
     )
-    working_dir = "${path.module}/../helpers"
+    working_dir = "${path.module}"
   }
 }
 
@@ -87,7 +87,7 @@ resource "volterra_virtual_k8s" "app_vk8s" {
        self.name,
        self.namespace
     )
-    working_dir = "${path.module}/../helpers"
+    working_dir = "${path.module}"
   }
 }
 
@@ -109,7 +109,7 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
        self.name,
        self.namespace
     )
-    working_dir = "${path.module}/../helpers"
+    working_dir = "${path.module}"
   }
 }
 
@@ -123,7 +123,7 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   provisioner "local-exec" {
     when    = destroy
     command = format("pip -r requirements.txt && python f5xc_cred_destroy.py --cred %s", self.id)
-    working_dir = "${path.module}/../helpers"
+    working_dir = "${path.module}"
   }
 }
 
@@ -137,7 +137,7 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
   provisioner "local-exec" {
     when    = destroy
     command = format("pip -r requirements.txt && python f5xc_cred_destroy.py --cred %s", self.id)
-    working_dir = "${path.module}/../helpers"
+    working_dir = "${path.module}"
   }
 }
 
