@@ -5,7 +5,7 @@ output "app_url" {
 
 output "app_namespace" {
   description = "Namespace created for this app"
-  value       = volterra_namespace.ns.name
+  value       = volterra_namespace.app_ns.name
 }
 
 output "utility_namespace" {

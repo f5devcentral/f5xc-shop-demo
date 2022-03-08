@@ -37,7 +37,6 @@ resource "volterra_namespace" "utility_ns" {
 resource "volterra_virtual_site" "spoke" {
   name      = format("%s-spoke-vs", volterra_namespace.app_ns.name)
   namespace = volterra_namespace.app_ns.name
-  depends_on = [time_sleep.ns_wait]
 
   site_selector {
     expressions = [var.spoke_site_selector]
@@ -48,7 +47,6 @@ resource "volterra_virtual_site" "spoke" {
 resource "volterra_virtual_site" "hub" {
   name      = format("%s-hub-vs", volterra_namespace.app_ns.name)
   namespace = volterra_namespace.app_ns.name
-  depends_on = [time_sleep.ns_wait]
 
   site_selector {
     expressions = [var.hub_site_selector]
@@ -60,7 +58,6 @@ resource "volterra_virtual_site" "hub" {
 resource "volterra_virtual_site" "utility" {
   name      = format("%s-vs", volterra_namespace.utility_ns.name)
   namespace = volterra_namespace.utility_ns.name
-  depends_on = [time_sleep.ns_utility_wait]
 
   site_selector {
     expressions = [var.utility_site_selector]
@@ -71,7 +68,6 @@ resource "volterra_virtual_site" "utility" {
 resource "volterra_virtual_k8s" "app_vk8s" {
   name      = format("%s-vk8s", volterra_namespace.app_ns.name)
   namespace = volterra_namespace.app_ns.name
-  depends_on = [time_sleep.ns_wait]
 
   vsite_refs {
     name      = volterra_virtual_site.hub.name
@@ -98,7 +94,6 @@ resource "volterra_virtual_k8s" "app_vk8s" {
 resource "volterra_virtual_k8s" "utility_vk8s" {
   name      = format("%s-vk8s", volterra_namespace.utility_ns.name)
   namespace = volterra_namespace.utility_ns.name
-  depends_on = [time_sleep.ns_utility_wait]
 
   vsite_refs {
     name      = volterra_virtual_site.utility.name
@@ -122,7 +117,7 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   name      = format("%s-api-cred", var.base)
   api_credential_type = "KUBE_CONFIG"
   virtual_k8s_namespace = volterra_namespace.app_ns.name
-  virtual_k8s_name = volterra_virtual_k8s.vk8s.name
+  virtual_k8s_name = volterra_virtual_k8s.app_vk8s.name
   expiry_days = var.cred_expiry_days
 
   provisioner "local-exec" {
