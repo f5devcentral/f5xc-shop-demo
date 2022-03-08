@@ -16,6 +16,10 @@ resource "null_resource" "pip" {
   provisioner "local-exec" {
     command = "pip3 install -r ${path.module}/requirements.txt"
   }
+  provisioner "local-exec" {
+    when    = destroy
+    command = "pip3 install -r ${path.module}/requirements.txt"
+  }
 }
 
 resource "volterra_namespace" "app_ns" {
