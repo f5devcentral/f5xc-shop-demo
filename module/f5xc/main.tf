@@ -12,14 +12,17 @@ resource "null_resource" "pip" {
   triggers = {
       build_number = "${timestamp()}"
   }
-
   provisioner "local-exec" {
     command = "pip3 install -r ${path.module}/requirements.txt"
   }
+}
+
+resource "null_resource" "pip-on-destroy" {
   provisioner "local-exec" {
     when    = destroy
     command = "pip3 install -r ${path.module}/requirements.txt"
   }
+  depends_on = [volterra_api_credential.app_vk8s_cred,volterra_api_credential.utility_vk8s_cred]
 }
 
 resource "volterra_namespace" "app_ns" {
