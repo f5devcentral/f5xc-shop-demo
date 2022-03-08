@@ -9,7 +9,7 @@ terraform {
 }
 
 resource "null_resource" "pip" {
-  triggers {
+  triggers = {
       build_number = "${timestamp()}"
   }
 
