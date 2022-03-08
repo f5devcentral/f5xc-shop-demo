@@ -8,17 +8,29 @@ terraform {
   }
 }
 
+resource "null_resource" "pip" {
+  triggers {
+      build_number = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "pip install -r requirements.txt"
+    working_dir = "${path.module}"
+  }
+}
+
 resource "volterra_namespace" "app_ns" {
   name = var.base
 
   provisioner "local-exec" {
     when    = create
     command = format(
-      "pip -r requirements.txt && python f5xc_resource_ready.py --type ns --name %s",
+      "python f5xc_resource_ready.py --type ns --name %s",
        self.name
     )
     working_dir = "${path.module}"
   }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_namespace" "utility_ns" {
@@ -27,11 +39,12 @@ resource "volterra_namespace" "utility_ns" {
   provisioner "local-exec" {
     when    = create
     command = format(
-      "pip -r requirements.txt && python f5xc_resource_ready.py --type ns --name %s",
+      "python f5xc_resource_ready.py --type ns --name %s",
        self.name
     )
     working_dir = "${path.module}"
   }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_site" "spoke" {
@@ -83,12 +96,13 @@ resource "volterra_virtual_k8s" "app_vk8s" {
   provisioner "local-exec" {
     when    = create
     command = format(
-      "pip -r requirements.txt && python f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
+      "python f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
        self.name,
        self.namespace
     )
     working_dir = "${path.module}"
   }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_k8s" "utility_vk8s" {
@@ -105,12 +119,13 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
   provisioner "local-exec" {
     when    = create
     command = format(
-      "pip -r requirements.txt && python f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
+      "python f5xc_resource_ready.py --type vk8s --name %s --namespace %s",
        self.name,
        self.namespace
     )
     working_dir = "${path.module}"
   }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_api_credential" "app_vk8s_cred" {
@@ -122,9 +137,10 @@ resource "volterra_api_credential" "app_vk8s_cred" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = format("pip -r requirements.txt && python f5xc_cred_destroy.py --cred %s", self.id)
+    command = format("python f5xc_cred_destroy.py --cred %s", self.id)
     working_dir = "${path.module}"
   }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
@@ -136,9 +152,10 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
  
   provisioner "local-exec" {
     when    = destroy
-    command = format("pip -r requirements.txt && python f5xc_cred_destroy.py --cred %s", self.id)
+    command = format("python f5xc_cred_destroy.py --cred %s", self.id)
     working_dir = "${path.module}"
   }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_app_type" "at" {
