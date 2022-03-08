@@ -37,7 +37,7 @@ def main():
         p12_pass = os.environ.get('VES_P12_PASSWORD')
         api_url = os.environ.get('VES_API_URL')
         s = getAuthSession(args.p12, p12_pass)
-        revokeCred(s, api_url, args.tenant, args.cred)
+        revokeCred(s, api_url, args.cred)
     except Exception as e:
         raise e
 
