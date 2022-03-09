@@ -4,6 +4,9 @@ variable "base" {
 variable "api_url" {
 }
 
+variable "api_p12_file" {
+}
+
 variable "app_fqdn" {
 }
 
