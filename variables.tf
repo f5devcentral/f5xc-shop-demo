@@ -1,17 +1,17 @@
-variable "base" {
-    default = "demo-app"
-}
-
-variable "app_fqdn" {
-    default = "demo-app.tenant.example.com"
-}
-
 variable "api_url" {
   default = "https://tenant.ves.volterra.io/api"
 }
 
 variable "api_p12_file" {
   default = "./creds/tenant.api-creds.p12"
+}
+
+variable "base" {
+    default = "demo-app"
+}
+
+variable "app_fqdn" {
+    default = "demo-app.tenant.example.com"
 }
 
 variable "spoke_site_selector" {
