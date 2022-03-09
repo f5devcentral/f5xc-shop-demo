@@ -8,44 +8,57 @@ terraform {
   }
 }
 
-resource "volterra_namespace" "ns" {
+resource "null_resource" "pip" {
+  triggers = {
+      build_number = "${timestamp()}"
+  }
+  provisioner "local-exec" {
+    command = "pip3 install -r ${path.module}/requirements.txt"
+  }
+}
+
+resource "volterra_namespace" "app_ns" {
   name = var.base
+
+  provisioner "local-exec" {
+    command           = "./f5xc_resource_ready.py --type ns --name ${self.name}"
+    working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
+  }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_namespace" "utility_ns" {
   name = format("%s-utility", var.base)
-}
 
-//Consistency issue with provider response for NS resource
-//https://github.com/volterraedge/terraform-provider-volterra/issues/53
-resource "time_sleep" "ns_wait" {
-  depends_on = [volterra_namespace.ns]
-  create_duration = "5s"
-}
-
-resource "time_sleep" "ns_utility_wait" {
-  depends_on = [volterra_namespace.utility_ns]
-  create_duration = "5s"
+  provisioner "local-exec" {
+    command           = "./f5xc_resource_ready.py --type ns --name ${self.name}"
+    working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
+  }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_site" "spoke" {
-  name      = format("%s-spoke-vs", volterra_namespace.ns.name)
-  namespace = volterra_namespace.ns.name
-  depends_on = [time_sleep.ns_wait]
+  name      = format("%s-spoke-vs", volterra_namespace.app_ns.name)
+  namespace = volterra_namespace.app_ns.name
 
   site_selector {
-    expressions = var.spoke_site_selector
+    expressions = [var.spoke_site_selector]
   }
   site_type = "REGIONAL_EDGE"
 }
 
 resource "volterra_virtual_site" "hub" {
-  name      = format("%s-hub-vs", volterra_namespace.ns.name)
-  namespace = volterra_namespace.ns.name
-  depends_on = [time_sleep.ns_wait]
+  name      = format("%s-hub-vs", volterra_namespace.app_ns.name)
+  namespace = volterra_namespace.app_ns.name
 
   site_selector {
-    expressions = var.hub_site_selector
+    expressions = [var.hub_site_selector]
   }
   site_type = "REGIONAL_EDGE"
 }
@@ -54,59 +67,66 @@ resource "volterra_virtual_site" "hub" {
 resource "volterra_virtual_site" "utility" {
   name      = format("%s-vs", volterra_namespace.utility_ns.name)
   namespace = volterra_namespace.utility_ns.name
-  depends_on = [time_sleep.ns_utility_wait]
 
   site_selector {
-    expressions = var.utility_site_selector
+    expressions = [var.utility_site_selector]
   }
   site_type = "REGIONAL_EDGE"
 }
 
-resource "volterra_virtual_k8s" "vk8s" {
-  name      = format("%s-vk8s", volterra_namespace.ns.name)
-  namespace = volterra_namespace.ns.name
-  depends_on = [time_sleep.ns_wait]
+resource "volterra_virtual_k8s" "app_vk8s" {
+  name      = format("%s-vk8s", volterra_namespace.app_ns.name)
+  namespace = volterra_namespace.app_ns.name
 
   vsite_refs {
     name      = volterra_virtual_site.hub.name
-    namespace = volterra_namespace.ns.name
+    namespace = volterra_namespace.app_ns.name
   }
   vsite_refs {
     name      = volterra_virtual_site.spoke.name
-    namespace = volterra_namespace.ns.name
+    namespace = volterra_namespace.app_ns.name
   }
+
+  //Consistency issue with vk8s resource response
+  //https://github.com/volterraedge/terraform-provider-volterra/issues/54
+  provisioner "local-exec" {
+    command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
+    working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
+  }
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_k8s" "utility_vk8s" {
   name      = format("%s-vk8s", volterra_namespace.utility_ns.name)
   namespace = volterra_namespace.utility_ns.name
-  depends_on = [time_sleep.ns_utility_wait]
 
   vsite_refs {
     name      = volterra_virtual_site.utility.name
     namespace = volterra_namespace.utility_ns.name
   }
+
+  //Consistency issue with vk8s resource response
+  //https://github.com/volterraedge/terraform-provider-volterra/issues/54
+  provisioner "local-exec" {
+    command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
+    working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
+  }
+  depends_on = [null_resource.pip]
 }
 
-//Consistency issue with vk8s resource response
-//https://github.com/volterraedge/terraform-provider-volterra/issues/54
-resource "time_sleep" "vk8s_wait" {
-  depends_on = [volterra_virtual_k8s.vk8s]
-  create_duration = "120s"
-}
-
-resource "time_sleep" "utility_vk8s_wait" {
-  depends_on = [volterra_virtual_k8s.utility_vk8s]
-  create_duration = "120s"
-}
-
-resource "volterra_api_credential" "vk8s_cred" {
+resource "volterra_api_credential" "app_vk8s_cred" {
   name      = format("%s-api-cred", var.base)
   api_credential_type = "KUBE_CONFIG"
-  virtual_k8s_namespace = volterra_namespace.ns.name
-  virtual_k8s_name = volterra_virtual_k8s.vk8s.name
+  virtual_k8s_namespace = volterra_namespace.app_ns.name
+  virtual_k8s_name = volterra_virtual_k8s.app_vk8s.name
   expiry_days = var.cred_expiry_days
-  depends_on = [time_sleep.vk8s_wait]
+
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
@@ -115,17 +135,7 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
   virtual_k8s_namespace = volterra_namespace.utility_ns.name
   virtual_k8s_name = volterra_virtual_k8s.utility_vk8s.name
   expiry_days = var.cred_expiry_days
-  depends_on = [time_sleep.utility_vk8s_wait]
-}
-
-resource "local_file" "kubeconfig" {
-    content = base64decode(volterra_api_credential.vk8s_cred.data)
-    filename = format("%s/../../creds/%s", path.module, format("%s-vk8s.yaml", terraform.workspace))
-}
-
-resource "local_file" "utility_kubeconfig" {
-    content = base64decode(volterra_api_credential.utility_vk8s_cred.data)
-    filename = format("%s/../../creds/%s", path.module, format("%s-utility-vk8s.yaml", terraform.workspace))
+ 
 }
 
 resource "volterra_app_type" "at" {
@@ -151,8 +161,7 @@ resource "volterra_app_type" "at" {
 
 resource "volterra_app_setting" "as" {
   name        = var.base
-  namespace   = volterra_namespace.ns.name
-  depends_on  = [time_sleep.ns_wait]
+  namespace   = volterra_namespace.app_ns.name
 
   app_type_settings {
     app_type_ref {
@@ -184,8 +193,8 @@ resource "volterra_app_setting" "as" {
 
 resource "volterra_healthcheck" "frontend" {
   name                   = format("%s-frontend", var.base)
-  namespace              = volterra_namespace.ns.name
-  depends_on             = [time_sleep.ns_wait]
+  namespace              = volterra_namespace.app_ns.name
+
   http_health_check {
     headers = {
       "Cookie" = "shop_session-id=x-liveness-probe"
@@ -201,8 +210,7 @@ resource "volterra_healthcheck" "frontend" {
 
 resource "volterra_origin_pool" "frontend" {
   name                   = format("%s-frontend", var.base)
-  namespace              = volterra_namespace.ns.name
-  depends_on             = [time_sleep.ns_wait]
+  namespace              = volterra_namespace.app_ns.name
   description            = format("Origin pool pointing to frontend k8s service running in main-vsite")
   loadbalancer_algorithm = "LB_OVERRIDE"
   endpoint_selection     = "LOCAL_PREFERRED"
@@ -211,11 +219,11 @@ resource "volterra_origin_pool" "frontend" {
       inside_network  = false
       outside_network = false
       vk8s_networks   = true
-      service_name    = format("frontend.%s", volterra_namespace.ns.name)
+      service_name    = format("frontend.%s", volterra_namespace.app_ns.name)
       site_locator {
         virtual_site {
           name      = volterra_virtual_site.spoke.name
-          namespace = volterra_namespace.ns.name
+          namespace = volterra_namespace.app_ns.name
         }
       }
     }
@@ -230,8 +238,7 @@ resource "volterra_origin_pool" "frontend" {
 
 resource "volterra_origin_pool" "redis" {
   name                   = format("%s-redis", var.base)
-  namespace              = volterra_namespace.ns.name
-  depends_on             = [time_sleep.ns_wait]
+  namespace              = volterra_namespace.app_ns.name
   description            = format("Origin pool pointing to redis k8s service running in utility-vsite")
   loadbalancer_algorithm = "LB_OVERRIDE"
   endpoint_selection     = "LOCAL_PREFERRED"
@@ -240,11 +247,11 @@ resource "volterra_origin_pool" "redis" {
       inside_network  = false
       outside_network = false
       vk8s_networks   = true
-      service_name    = format("redis-cart.%s", volterra_namespace.ns.name)
+      service_name    = format("redis-cart.%s", volterra_namespace.app_ns.name)
       site_locator {
         virtual_site {
           name      = volterra_virtual_site.hub.name
-          namespace = volterra_namespace.ns.name
+          namespace = volterra_namespace.app_ns.name
         }
       }
     }
@@ -255,8 +262,7 @@ resource "volterra_origin_pool" "redis" {
 
 resource "volterra_origin_pool" "adservice" {
   name                   = format("%s-ad", var.base)
-  namespace              = volterra_namespace.ns.name
-  depends_on             = [time_sleep.ns_wait]
+  namespace              = volterra_namespace.app_ns.name
   description            = format("Origin pool pointing to adservice k8s service running in utility-vsite")
   loadbalancer_algorithm = "LB_OVERRIDE"
   endpoint_selection     = "LOCAL_PREFERRED"
@@ -265,11 +271,11 @@ resource "volterra_origin_pool" "adservice" {
       inside_network  = false
       outside_network = false
       vk8s_networks   = true
-      service_name    = format("adservice.%s", volterra_namespace.ns.name)
+      service_name    = format("adservice.%s", volterra_namespace.app_ns.name)
       site_locator {
         virtual_site {
           name      = volterra_virtual_site.hub.name
-          namespace = volterra_namespace.ns.name
+          namespace = volterra_namespace.app_ns.name
         }
       }
     }
@@ -281,8 +287,7 @@ resource "volterra_origin_pool" "adservice" {
 resource "volterra_user_identification" "ui" {
   name        = format("%s-user-id", var.base)
   description = format("User Idenfication for %s", var.base)
-  namespace   = volterra_namespace.ns.name
-  depends_on = [time_sleep.ns_wait]
+  namespace   = volterra_namespace.app_ns.name
 
   rules {
     cookie_name = "shop_session-id"
@@ -292,8 +297,7 @@ resource "volterra_user_identification" "ui" {
 resource "volterra_app_firewall" "af" {
   name        = format("%s-app-firewall", var.base)
   description = format("App Firewall in blocking mode for %s", var.base)
-  namespace   = volterra_namespace.ns.name
-  depends_on = [time_sleep.ns_wait]
+  namespace   = volterra_namespace.app_ns.name
 
   allow_all_response_codes = true
   default_anonymization = true
@@ -305,8 +309,7 @@ resource "volterra_app_firewall" "af" {
 
 resource "volterra_http_loadbalancer" "frontend" {
   name                            = format("%s-fe", var.base)
-  namespace                       = volterra_namespace.ns.name
-  depends_on                      = [time_sleep.ns_wait]
+  namespace                       = volterra_namespace.app_ns.name
   description                     = format("HTTPS loadbalancer object for %s origin server", var.base)
   domains                         = [var.app_fqdn]
   advertise_on_public_default_vip = true
@@ -315,7 +318,7 @@ resource "volterra_http_loadbalancer" "frontend" {
   default_route_pools {
     pool {
       name      = volterra_origin_pool.frontend.name
-      namespace = volterra_namespace.ns.name
+      namespace = volterra_namespace.app_ns.name
     }
   }
   https_auto_cert {
@@ -327,7 +330,7 @@ resource "volterra_http_loadbalancer" "frontend" {
   multi_lb_app = true
   app_firewall {
     name      = volterra_app_firewall.af.name
-    namespace = volterra_namespace.ns.name
+    namespace = volterra_namespace.app_ns.name
   }
   bot_defense {
     policy {
@@ -360,12 +363,12 @@ resource "volterra_http_loadbalancer" "frontend" {
   }
   user_identification {
     name      = volterra_user_identification.ui.name
-    namespace = volterra_namespace.ns.name
+    namespace = volterra_namespace.app_ns.name
   }
   more_option {
     custom_errors = {
-      408 : format("string:///%s", filebase64("${path.module}/../../error-page.html")),
-      503 : format("string:///%s", filebase64("${path.module}/../../error-page.html"))      
+      408 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html")),
+      503 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html"))      
     }
     idle_timeout = 5000
   }
@@ -377,8 +380,7 @@ resource "volterra_http_loadbalancer" "frontend" {
 
 resource "volterra_tcp_loadbalancer" "redis" {
   name                            = format("%s-redis", var.base)
-  namespace                       = volterra_namespace.ns.name
-  depends_on                      = [time_sleep.ns_wait]
+  namespace                       = volterra_namespace.app_ns.name
   description                     = format("TCP loadbalancer object for %s redis service", var.base)
   domains                         = ["redis-cart.internal"]
   dns_volterra_managed            = false
@@ -387,7 +389,7 @@ resource "volterra_tcp_loadbalancer" "redis" {
   origin_pools_weights {
     pool {
       name      = volterra_origin_pool.redis.name
-      namespace = volterra_namespace.ns.name
+      namespace = volterra_namespace.app_ns.name
     }
   }
   advertise_custom {
@@ -395,7 +397,7 @@ resource "volterra_tcp_loadbalancer" "redis" {
       vk8s_service {
         virtual_site {
           name      = volterra_virtual_site.spoke.name
-          namespace = volterra_namespace.ns.name
+          namespace = volterra_namespace.app_ns.name
         }
       }
     port = 6379
@@ -407,8 +409,7 @@ resource "volterra_tcp_loadbalancer" "redis" {
 
 resource "volterra_tcp_loadbalancer" "adservice" {
   name                            = format("%s-adservice", var.base)
-  namespace                       = volterra_namespace.ns.name
-  depends_on                      = [time_sleep.ns_wait]
+  namespace                       = volterra_namespace.app_ns.name
   description                     = format("TCP loadbalancer object for %s adservice grpc service", var.base)
   domains                         = ["adservice.internal"]
   dns_volterra_managed            = false
@@ -417,7 +418,7 @@ resource "volterra_tcp_loadbalancer" "adservice" {
   origin_pools_weights {
     pool {
       name      = volterra_origin_pool.adservice.name
-      namespace = volterra_namespace.ns.name
+      namespace = volterra_namespace.app_ns.name
     }
   }
   advertise_custom {
@@ -425,7 +426,7 @@ resource "volterra_tcp_loadbalancer" "adservice" {
       vk8s_service {
         virtual_site {
           name      = volterra_virtual_site.spoke.name
-          namespace = volterra_namespace.ns.name
+          namespace = volterra_namespace.app_ns.name
         }
       }
     port = 9555

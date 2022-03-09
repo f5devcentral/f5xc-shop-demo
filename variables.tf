@@ -10,9 +10,6 @@ variable "api_url" {
   default = "https://tenant.ves.volterra.io/api"
 }
 
-variable "ves_cred" {
-}
-
 variable "api_p12_file" {
   default = "./creds/tenant.api-creds.p12"
 }

@@ -1,13 +1,10 @@
 variable "base" {
 }
 
-variable "app_fqdn" {
-}
-
 variable "api_url" {
 }
 
-variable "api_p12_file" {
+variable "app_fqdn" {
 }
 
 variable "spoke_site_selector" {

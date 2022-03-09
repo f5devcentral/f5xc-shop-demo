@@ -3,9 +3,9 @@ output "app_url" {
   value       = format("https://%s", var.app_fqdn)
 }
 
-output "namespace" {
+output "app_namespace" {
   description = "Namespace created for this app"
-  value       = volterra_namespace.ns.name
+  value       = volterra_namespace.app_ns.name
 }
 
 output "utility_namespace" {
@@ -28,12 +28,58 @@ output "utility_vsite" {
   value       = volterra_virtual_site.utility.name
 }
 
-output "app_kubecfg" {
-  description = "kubeconfig file"
-  value       = local_file.kubeconfig
+output "app_kubecfg_host" {
+  description = "host value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.app_vk8s_cred.data))["clusters"][0]["cluster"]["server"]
+  sensitive   = false
 }
 
-output "utility_kubecfg" {
-  description = "kubeconfig file for utility vk8s"
-  value       = local_file.utility_kubeconfig
+output "app_vk8s" {
+  value = volterra_virtual_k8s.app_vk8s.id
+}
+
+output "utility_vk8s" {
+  value = volterra_virtual_k8s.utility_vk8s.id
+}
+
+output "app_kubecfg_cluster_ca" {
+  description = "cluster ca value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.app_vk8s_cred.data))["clusters"][0]["cluster"]["certificate-authority-data"]
+  sensitive   = true
+}
+
+output "app_kubecfg_client_cert" {
+  description = "cluster cert value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.app_vk8s_cred.data))["users"][0]["user"]["client-certificate-data"]
+  sensitive   = true
+}
+
+output "app_kubecfg_client_key" {
+  description = "client key value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.app_vk8s_cred.data))["users"][0]["user"]["client-key-data"]
+  sensitive   = true
+}
+
+output "utility_kubecfg_host" {
+  description = "host value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.utility_vk8s_cred.data))["clusters"][0]["cluster"]["server"]
+  sensitive   = false
+}
+
+output "utility_kubecfg_cluster_ca" {
+  description = "cluster ca value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.utility_vk8s_cred.data))["clusters"][0]["cluster"]["certificate-authority-data"]
+  sensitive   = true
+}
+
+output "utility_kubecfg_client_cert" {
+  description = "cluster cert value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.utility_vk8s_cred.data))["users"][0]["user"]["client-certificate-data"]
+  sensitive   = true
+}
+
+output "utility_kubecfg_client_key" {
+  description = "client key value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.utility_vk8s_cred.data))["users"][0]["user"]["client-key-data"]
+  sensitive   = true
 }

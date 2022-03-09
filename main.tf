@@ -12,38 +12,37 @@ terraform {
   }
 }
 
-resource "local_file" "cred" {
-    content_base64 = var.ves_cred
-    filename       = "${path.module}/module/f5xc/cred.p12"
-}
-
 provider "volterra" {
-  api_p12_file = local_file.cred.filename
+  api_p12_file = "./cred.p12"
   url          = var.api_url
 }
 
 provider "kubectl" {
-  alias = "app"
-  config_path = module.f5xc.app_kubecfg
-  apply_retry_count = 2
+  alias                  = "app"
+  host                   = module.f5xc.app_kubecfg_host
+  cluster_ca_certificate = base64decode(module.f5xc.app_kubecfg_cluster_ca)
+  client_certificate     = base64decode(module.f5xc.app_kubecfg_client_cert)
+  client_key             = base64decode(module.f5xc.app_kubecfg_client_key)
+  load_config_file       = false
+  apply_retry_count      = 10
 }
 
 provider "kubectl" {
-  alias = "utility"
-  config_path = module.f5xc.utility_kubecfg
-  apply_retry_count = 2
+  alias                  = "utility"
+  host                   = module.f5xc.utility_kubecfg_host
+  cluster_ca_certificate = base64decode(module.f5xc.utility_kubecfg_cluster_ca)
+  client_certificate     = base64decode(module.f5xc.utility_kubecfg_client_cert)
+  client_key             = base64decode(module.f5xc.utility_kubecfg_client_key)
+  load_config_file       = false
+  apply_retry_count      = 10
 }
 
 module "f5xc" {
   source = "./module/f5xc"
-  depends_on = [
-    local_file.cred
-  ]
 
+  api_url = var.api_url
   base = var.base
   app_fqdn = var.app_fqdn
-  api_url = var.api_url
-  api_p12_file = "${path.module}/cred.p12" //ensure this is present on all runs?
   spoke_site_selector = var.spoke_site_selector
   hub_site_selector = var.hub_site_selector
   utility_site_selector = var.utility_site_selector
@@ -57,13 +56,13 @@ module "virtualk8s" {
     kubectl.app     = kubectl.app
     kubectl.utility = kubectl.utility
   }
- 
+  
   reg_server = var.registry_server
-  reg_password_b64 = base64encode(var.registry_password)
+  reg_password_b64 = var.registry_password
   reg_server_b64 = base64encode(var.registry_server)
   reg_username_b64 = base64encode(var.registry_username)
 
-  app_namespace = module.f5xc.namespace
+  app_namespace = module.f5xc.app_namespace
   utility_namespace = module.f5xc.utility_namespace
   spoke_vsite = module.f5xc.spoke_vsite
   hub_vsite = module.f5xc.hub_vsite
