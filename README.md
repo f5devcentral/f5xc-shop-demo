@@ -1,23 +1,25 @@
-# Solutions Engineering Template Repository
-A template repository that contains all required files (LICENSE, SUPPORT, CONTRIBUTING, etc) as outlined in the org standards.  
-
-
-The sections below are recommended in your project's README.md file. 
+# F5XC Shop Demo Application
 
 ## Overview
-Provide a short overview of the project.
+This repository represents a deployment of the [GCP microservices demo](https://github.com/GoogleCloudPlatform/microservices-demo).
+A deployment is self-contained and runs solely on F5 Distributed Cloud (F5xc) Regional Edges. No CSP resources are used.
+
+The app consists of 11 microservices that talk to each other over gRPC.
+![demo arch](https://github.com/GoogleCloudPlatform/microservices-demo/raw/main/docs/img/architecture-diagram.png)
+
+Synthetic load generation is included.
+Once deployed, F5xc Console will be populated with realistic data.
+This allows the demonstration of key F5xc Console concept such as:
+- traffic and application vizualizations
+- HTTP request telemetry
+- security event monitoring
+- virtual kubernetes (vk8s) and edge workloads
 
 ## Getting Started
-Provide a quick example of how to use your code.  This should provide the user with a launch point to quickly see what the project can offer them. 
-
-## Installation
-Outline the requirements and steps to install this project. 
-
-## Usage
-Outline how the user can use your project and the various features the project offers. 
+You may clone this repo, provide your own _tfvars_ an deploy in any F5xc tenant. Deploys for F5xc sales demos tenants are done through Terraform Cloud.
 
 ## Development
-Outline any requirements to setup a development environment if someone would like to contribute.  You may also link to another file for this information. 
+The ```main``` branch is protected. Pull Requests to ```main``` must come from ```staging``` after testing is complete and be approved by a repo administrator. Please submit PRs to ```dev``` for feature development. Use Github issues for feature requests.
 
 ## Support
 For support, please open a GitHub issue.  Note, the code in this repository is community supported and is not supported by F5 Networks.  For a complete list of supported projects please reference [SUPPORT.md](SUPPORT.md).
