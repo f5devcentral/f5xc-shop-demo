@@ -41,7 +41,7 @@ module "f5xc" {
   source = "./module/f5xc"
 
   api_url = var.api_url
-  api_p12_file = "${path.root}/creds/${var.api_p12_file}"
+  api_p12_file = "${path.module}/../../creds/${var.api_p12_file}"
   base = var.base
   app_fqdn = var.app_fqdn
   spoke_site_selector = var.spoke_site_selector
