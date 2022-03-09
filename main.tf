@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "volterra" {
-  api_p12_file = "./cred.p12"
+  api_p12_file = "${path.root}/creds/${var.api_p12_file}"
   url          = var.api_url
 }
 
