@@ -23,6 +23,9 @@ resource "volterra_namespace" "app_ns" {
   provisioner "local-exec" {
     command           = "./f5xc_resource_ready.py --type ns --name ${self.name}"
     working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
   }
   depends_on = [null_resource.pip]
 }
@@ -33,6 +36,9 @@ resource "volterra_namespace" "utility_ns" {
   provisioner "local-exec" {
     command           = "./f5xc_resource_ready.py --type ns --name ${self.name}"
     working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
   }
   depends_on = [null_resource.pip]
 }
@@ -86,6 +92,9 @@ resource "volterra_virtual_k8s" "app_vk8s" {
   provisioner "local-exec" {
     command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
     working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
   }
   depends_on = [null_resource.pip]
 }
@@ -104,6 +113,9 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
   provisioner "local-exec" {
     command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
     working_dir = "${path.module}"
+    environment = {
+      VES_API_URL = var.api_url
+    }
   }
   depends_on = [null_resource.pip]
 }
