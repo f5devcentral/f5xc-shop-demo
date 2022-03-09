@@ -51,17 +51,12 @@ def main():
         default='system',
         required=False
     )
-    ap.add_argument(
-        '--p12',
-        help='p12 cred file',
-        default='../../cred.p12',
-        required=False
-    )
     args = ap.parse_args()
     try:
         p12_pass = os.environ.get('VES_P12_PASSWORD')
+        p12 = os.environ.get('VES_P12')
         api_url = os.environ.get('VES_API_URL')
-        s = getAuthSession(args.p12, p12_pass)
+        s = getAuthSession(p12, p12_pass)
         isResourceReady(s, api_url, args.type, args.name, args.ns)
     except Exception as e:
         raise e
