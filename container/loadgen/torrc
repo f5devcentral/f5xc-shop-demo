@@ -1,0 +1,7 @@
+HardwareAccel 0
+Log notice stderr
+DNSPort 127.0.0.1:8853
+SocksPort 127.0.0.1:9150
+DataDirectory /tmp/tor
+RunAsDaemon 1
+Log info file /tmp/log/tor.log
