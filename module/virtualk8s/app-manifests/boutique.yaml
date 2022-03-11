@@ -331,7 +331,7 @@ spec:
           - name: DISABLE_PROFILER
             value: "1"
         - name: proxy
-          image: ${reg_server}/nginx-unprivileged
+          image: ${reg_server}/proxy
           ports:
           - containerPort: 8181
           readinessProbe:
