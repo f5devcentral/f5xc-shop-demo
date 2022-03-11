@@ -59,9 +59,6 @@ module "virtualk8s" {
   }
   
   reg_server = var.registry_server
-  reg_password_b64 = var.registry_password
-  reg_server_b64 = base64encode(var.registry_server)
-  reg_username_b64 = base64encode(var.registry_username)
   registry_config_json = var.registry_config_json
 
   app_namespace = module.f5xc.app_namespace
