@@ -365,7 +365,7 @@ spec:
             - key: error.html
               path: error.html
       imagePullSecrets:
-      - name: registry-secret
+      - name: f5demos-registry-secret
 ---
 apiVersion: v1
 kind: Service
@@ -708,7 +708,7 @@ spec:
       - name: redis-data
         emptyDir: {}
       imagePullSecrets:
-      - name: registry-secret
+      - name: f5demos-registry-secret
 ---
 apiVersion: v1
 kind: Service
