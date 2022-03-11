@@ -15,10 +15,8 @@ data "kubectl_path_documents" "app-manifests" {
         namespace = var.app_namespace,
         spoke_vsite = var.spoke_vsite,
         hub_vsite = var.hub_vsite,
-        reg_password_b64 = var.reg_password_b64,
-        reg_server_b64 = var.reg_server_b64,
-        reg_username_b64 = var.reg_username_b64,
-        registry_config_json = var.registry_config_json
+        reg_server = var.reg_server,
+        registry_config_json = var.registry_config_json,
         reg_server = var.reg_server
         tenant_js_ref = var.tenant_js_ref
     }
@@ -30,11 +28,8 @@ data "kubectl_path_documents" "utility-manifests" {
     vars = {
         utility_namespace = var.utility_namespace,
         utility_vsite = var.utility_vsite,
-        reg_password_b64 = var.reg_password_b64,
-        reg_server_b64 = var.reg_server_b64,
-        reg_username_b64 = var.reg_username_b64,
-        registry_config_json = var.registry_config_json
-        reg_server = var.reg_server
+        reg_server = var.reg_server,
+        registry_config_json = var.registry_config_json,
         target_url = var.target_url
     }
 }

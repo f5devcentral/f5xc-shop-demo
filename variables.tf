@@ -7,11 +7,11 @@ variable "api_p12_file" {
 }
 
 variable "base" {
-    default = "demo-app"
+  default = "demo-app"
 }
 
 variable "app_fqdn" {
-    default = "demo-app.tenant.example.com"
+  default = "demo-app.tenant.example.com"
 }
 
 variable "spoke_site_selector" {
@@ -30,25 +30,19 @@ variable "cred_expiry_days" {
   default = 89
 }
 
-variable "registry_password" {
-    default = "2string:///some_b64e_password"
-}
-
-variable "registry_username" {
-    default = "some_user"
-}
-
 variable "registry_server" {
-    default = "some_registry.example.com"
+  default = "some_registry.example.com"
 }
 
 variable "registry_config_json" {
+  default     = "b64 encoded json"
+  description = "registry config data string in type kubernetes.io/dockerconfigjson"
 }
 
 variable "bot_defense_region" {
-    default = "US"
+  default = "US"
 }
 
 variable "tenant_js_ref" {
-    default = "volt-f5_sales_demo_rljyvvmw-49301db1"
+  default = "volt-f5_sales_demo_rljyvvmw-49301db1"
 }
