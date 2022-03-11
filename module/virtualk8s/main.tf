@@ -18,6 +18,7 @@ data "kubectl_path_documents" "app-manifests" {
         reg_password_b64 = var.reg_password_b64,
         reg_server_b64 = var.reg_server_b64,
         reg_username_b64 = var.reg_username_b64,
+        registry_config_json = var.registry_config_json
         reg_server = var.reg_server
         tenant_js_ref = var.tenant_js_ref
     }
@@ -32,6 +33,7 @@ data "kubectl_path_documents" "utility-manifests" {
         reg_password_b64 = var.reg_password_b64,
         reg_server_b64 = var.reg_server_b64,
         reg_username_b64 = var.reg_username_b64,
+        registry_config_json = var.registry_config_json
         reg_server = var.reg_server
         target_url = var.target_url
     }
