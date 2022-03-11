@@ -10,6 +10,9 @@ variable "reg_server_b64" {
 variable "reg_username_b64" {
 }
 
+variable "registry_config_json" {
+}
+
 variable "app_namespace" {
 }
 

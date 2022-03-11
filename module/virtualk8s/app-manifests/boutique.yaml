@@ -331,7 +331,7 @@ spec:
           - name: DISABLE_PROFILER
             value: "1"
         - name: proxy
-          image: ${reg_server}/nginx-unprivileged
+          image: ${reg_server}/proxy
           ports:
           - containerPort: 8181
           readinessProbe:
@@ -365,7 +365,7 @@ spec:
             - key: error.html
               path: error.html
       imagePullSecrets:
-      - name: registry-secret
+      - name: f5demos-registry-secret
 ---
 apiVersion: v1
 kind: Service
@@ -708,7 +708,7 @@ spec:
       - name: redis-data
         emptyDir: {}
       imagePullSecrets:
-      - name: registry-secret
+      - name: f5demos-registry-secret
 ---
 apiVersion: v1
 kind: Service

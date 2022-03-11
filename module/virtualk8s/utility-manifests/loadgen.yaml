@@ -17,8 +17,8 @@ spec:
             ves.io/virtual-sites: ${utility_namespace}/${utility_vsite}
         spec:
           containers:
-            - name: volt-traffic-gen
-              image: ${reg_server}/volt-traffic-gen
+            - name: shop-traffic-gen
+              image: ${reg_server}/loadgen
               env:
                 - name: DURATION
                   value: 5m
@@ -34,4 +34,4 @@ spec:
           dnsPolicy: ClusterFirst
           securityContext: {}
           imagePullSecrets:
-            - name: registry-secret
+            - name: f5demos-registry-secret
