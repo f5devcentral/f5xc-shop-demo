@@ -1,0 +1,67 @@
+  kind: ServiceAccount
+  apiVersion: v1
+  metadata:
+    name: podcleaner
+    namespace: demo-shop-stage
+  ---
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    name: modify-pods
+  rules:
+    - apiGroups: [""]
+      resources:
+        - pods
+      verbs:
+        - get
+        - list
+        - delete
+  ---
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: modify-pods-to-pc
+  subjects:
+    - kind: ServiceAccount
+      name: podcleaner
+      namespace: demo-shop-stage
+  roleRef:
+    kind: Role
+    name: modify-pods
+    apiGroup: rbac.authorization.k8s.io
+  ---
+  kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: kubectl
+    namespace: demo-shop-stage
+    annotations:
+      ves.io/virtual-sites: demo-shop-stage-hub-vs
+      ves.io/workload-flavor: ves-io-tiny
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: kubectl
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: kubectl
+      spec:
+        containers:
+          - name: server
+            image: f5demos.azurecr.io/podcleaner
+            command:
+              - /bin/sh
+            args:
+              - -c
+              - sleep infinity
+            imagePullPolicy: IfNotPresent
+        restartPolicy: Always
+        serviceAccountName: podcleaner
+        imagePullSecrets:
+          - name: f5demos-registry-secret
+
+
+  
