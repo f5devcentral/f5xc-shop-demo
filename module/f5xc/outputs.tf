@@ -86,6 +86,6 @@ output "utility_kubecfg_client_key" {
 
 output "app_kubecfg" {
   description = "app kubeconfig"
-  value       = base64decode(volterra_api_credential.app_vk8s_cred.data)
+  value       = local_sensitive_file.app_kubecfg
   sensitive   = true
 }

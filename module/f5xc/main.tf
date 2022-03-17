@@ -4,6 +4,10 @@ terraform {
       source = "volterraedge/volterra"
       version = "0.11.3"
     }
+    local = {
+      source = "hashicorp/local"
+      version = "2.2.2"
+    }
   }
 }
 
@@ -131,7 +135,7 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   expiry_days = var.cred_expiry_days
 }
 
-resource "local_sensitive_file" "app_kubeconfig" {
+resource "local_sensitive_file" "app_kubecfg" {
     content  = volterra_api_credential.app_vk8s_cred.data
     filename = "${path.module}/../../kubeconfig"
 }
