@@ -43,14 +43,6 @@ def deletePods(client, podNames: list, namespace: str) -> None:
     except Exception as e:
         raise e
 
-
-client = getClient("~/Downloads/ves_demo-shop_demo-shop-vk8s.yaml")
-failed = getFailedPods(client, "demo-shop")
-misbehavin = getMisbehavinPods(client, "demo-shop")
-print(failed, misbehavin)
-deletePods(client, failed, "demo-shop")
-deletePods(client, misbehavin, "demo-shop")
-
 def main():
     try:
         namespace = os.environ.get('NAMESPACE')
