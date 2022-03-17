@@ -132,6 +132,11 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   expiry_days = var.cred_expiry_days
 }
 
+resource "local_sensitive_file" "app_kubeconfig" {
+    content  = volterra_api_credential.app_vk8s_cred.data
+    filename = "${path.module}/../../kubeconfig"
+}
+
 resource "volterra_api_credential" "utility_vk8s_cred" {
   name      = format("%s-utl-cred", var.base)
   api_credential_type = "KUBE_CONFIG"

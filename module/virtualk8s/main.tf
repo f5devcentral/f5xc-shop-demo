@@ -8,6 +8,10 @@ terraform {
   }
 }
 
+data "local_sensitive_file" "app_kubecfg" {
+    filename = "${path.module}/../../kubeconfig"
+}
+
 data "kubectl_path_documents" "app-manifests" {
     provider = kubectl.app
     pattern  = "${path.module}/app-manifests/*.yaml"
@@ -32,6 +36,7 @@ data "kubectl_path_documents" "utility-manifests" {
         registry_config_json = var.registry_config_json,
         target_url = var.target_url,
         app_namespace = var.app_namespace
+        app_kubecfg = local_sensitive_file.app_kubecfg.content
     }
 }
 
@@ -47,18 +52,4 @@ resource "kubectl_manifest" "utility-resources" {
     for_each  = toset(data.kubectl_path_documents.utility-manifests.documents)
     yaml_body = each.value
     override_namespace = var.utility_namespace
-}
-
-//Treating this one diff as it's contents aren't know until apply
-data "kubectl_file_documents" "cleaner" {
-    content = file("${path.module}/utility-manifests/clean.yml")
-    vars = {
-        app_kubecfg = var.app_kubecfg
-    }
-}
-
-resource "kubectl_manifest" "cleaner" {
-  provider  = kubectl.utility
-  for_each  = data.kubectl_file_documents.cleaner.manifests
-  yaml_body = each.value
 }
