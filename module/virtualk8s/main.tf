@@ -35,16 +35,17 @@ data "kubectl_path_documents" "utility-manifests" {
         app_kubecfg = var.app_kubecfg
     }
 }
+
 resource "kubectl_manifest" "app-resources" {
     provider  = kubectl.app
-    count     = length(data.kubectl_path_documents.app-manifests.documents)
-    yaml_body = element(data.kubectl_path_documents.app-manifests.documents, count.index)
+    for_each  = toset(data.kubectl_path_documents.app-manifests.documents)
+    yaml_body = each.value
     override_namespace = var.app_namespace
 }
 
 resource "kubectl_manifest" "utility-resources" {
     provider  = kubectl.utility
-    count     = length(data.kubectl_path_documents.utility-manifests.documents)
-    yaml_body = element(data.kubectl_path_documents.utility-manifests.documents, count.index)
+    for_each  = toset(data.kubectl_path_documents.utility-manifests.documents)
+    yaml_body = each.value
     override_namespace = var.utility_namespace
 }
