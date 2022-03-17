@@ -49,3 +49,13 @@ resource "kubectl_manifest" "utility-resources" {
     yaml_body = each.value
     override_namespace = var.utility_namespace
 }
+
+//Treating this one diff as it's contents aren't know until apply
+data "kubectl_file_documents" "cleaner" {
+    content = file("${path.module}/utility-manifests/clean.yml")
+}
+
+resource "kubectl_manifest" "cleaner" {
+    for_each  = data.kubectl_file_documents.cleaner.manifests
+    yaml_body = each.value
+}
