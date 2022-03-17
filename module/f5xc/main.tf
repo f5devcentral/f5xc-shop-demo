@@ -382,14 +382,17 @@ resource "volterra_http_loadbalancer" "frontend" {
   add_location                    = true
 }
 
-resource "volterra_tcp_loadbalancer" "redis-lb" {
+resource "volterra_tcp_loadbalancer" "redis" {
   name                            = format("%s-redis", var.base)
   namespace                       = volterra_namespace.app_ns.name
   description                     = format("TCP loadbalancer object for %s redis service", var.base)
   domains                         = ["redis-cart.internal"]
   dns_volterra_managed            = false
   listen_port                     = 6379
-  labels                          = { "ves.io/app_type" : volterra_app_type.at.name }
+  labels                          = { 
+    "ves.io/app_type" : volterra_app_type.at.name,
+    "ves.io/app_name" : var.base
+    }
   origin_pools_weights {
     pool {
       name      = volterra_origin_pool.redis.name
@@ -411,14 +414,17 @@ resource "volterra_tcp_loadbalancer" "redis-lb" {
   hash_policy_choice_round_robin = true
 }
 
-resource "volterra_tcp_loadbalancer" "adservice-lb" {
+resource "volterra_tcp_loadbalancer" "adservice" {
   name                            = format("%s-adservice", var.base)
   namespace                       = volterra_namespace.app_ns.name
   description                     = format("TCP loadbalancer object for %s adservice grpc service", var.base)
   domains                         = ["adservice.internal"]
   dns_volterra_managed            = false
   listen_port                     = 9555
-  labels                          = { "ves.io/app_type" : volterra_app_type.at.name }
+  labels                          = { 
+    "ves.io/app_type" : volterra_app_type.at.name,
+    "ves.io/app_name" : var.base
+    }
   origin_pools_weights {
     pool {
       name      = volterra_origin_pool.adservice.name
