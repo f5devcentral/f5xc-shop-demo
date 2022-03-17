@@ -382,7 +382,7 @@ resource "volterra_http_loadbalancer" "frontend" {
   add_location                    = true
 }
 
-resource "volterra_tcp_loadbalancer" "redis" {
+resource "volterra_tcp_loadbalancer" "redis-lb" {
   name                            = format("%s-redis", var.base)
   namespace                       = volterra_namespace.app_ns.name
   description                     = format("TCP loadbalancer object for %s redis service", var.base)
@@ -411,7 +411,7 @@ resource "volterra_tcp_loadbalancer" "redis" {
   hash_policy_choice_round_robin = true
 }
 
-resource "volterra_tcp_loadbalancer" "adservice" {
+resource "volterra_tcp_loadbalancer" "adservice-lb" {
   name                            = format("%s-adservice", var.base)
   namespace                       = volterra_namespace.app_ns.name
   description                     = format("TCP loadbalancer object for %s adservice grpc service", var.base)
