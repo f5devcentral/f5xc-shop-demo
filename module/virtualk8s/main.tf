@@ -9,7 +9,6 @@ terraform {
 }
 
 data "kubectl_path_documents" "app-manifests" {
-    provider = kubectl.app
     pattern  = "${path.module}/app-manifests/*.yaml"
     vars = {
         namespace = var.app_namespace,
@@ -23,7 +22,6 @@ data "kubectl_path_documents" "app-manifests" {
 }
 
 data "kubectl_path_documents" "utility-manifests" {
-    provider =  kubectl.utility
     pattern  = "${path.module}/utility-manifests/*.yaml"
     vars = {
         utility_namespace = var.utility_namespace,
