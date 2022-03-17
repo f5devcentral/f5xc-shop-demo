@@ -63,6 +63,7 @@ module "virtualk8s" {
   providers = {
     kubectl.app     = kubectl.app
     kubectl.utility = kubectl.utility
+    local           = local
   }
   
   reg_server = var.registry_server
