@@ -1,9 +1,9 @@
 from kubernetes import client, config
+import os
 
-def getClient():
+def getClient(kubeconfig: str):
     try:
-        #placeholder for when we need to actually **do** something here
-        config.load_kube_config()
+        config.load_kube_config(kubeconfig)
         v1 = client.CoreV1Api()
         return (v1)
     except Exception as e:
@@ -27,10 +27,11 @@ def getMisbehavinPods(client, namespace: str, restartThreshold: int=5) -> list:
         pods = client.list_namespaced_pod(namespace)
         for pod in pods.items:
             restarts = 0
-            for container in pod.status.container_statuses:
-                restarts = restarts + container.restart_count
-            if restarts >= restartThreshold:#
-                misbehavin.append(pod.metadata.name)
+            if pod.status.container_statuses:
+                for container in pod.status.container_statuses:
+                    restarts = restarts + container.restart_count
+                if restarts >= restartThreshold:
+                    misbehavin.append(pod.metadata.name)
         return(misbehavin)
     except Exception as e:
         raise e
@@ -43,8 +44,25 @@ def deletePods(client, podNames: list, namespace: str) -> None:
         raise e
 
 
-client = getClient()
-failed = getFailedPods(client, "demo-shop-stage")
-misbehavin = getMisbehavinPods(client, "demo-shop-stage")
-deletePods(client, failed, "demo-shop-stage")
-deletePods(client, misbehavin, "demo-shop-stage")
+client = getClient("~/Downloads/ves_demo-shop_demo-shop-vk8s.yaml")
+failed = getFailedPods(client, "demo-shop")
+misbehavin = getMisbehavinPods(client, "demo-shop")
+print(failed, misbehavin)
+deletePods(client, failed, "demo-shop")
+deletePods(client, misbehavin, "demo-shop")
+
+def main():
+    try:
+        namespace = os.environ.get('NAMESPACE')
+        kubeconfPath = os.environ.get('KUBE_PATH')
+        client = getClient(kubeconfPath)
+        failed = getFailedPods(client, namespace)
+        misbehavin = getMisbehavinPods(client, namespace)
+        print(failed, misbehavin) #Do better logging here
+        deletePods(client, failed, namespace)
+        deletePods(client, misbehavin, namespace)
+    except Exception as e:
+        raise e
+
+if __name__ == '__main__':
+    main()
