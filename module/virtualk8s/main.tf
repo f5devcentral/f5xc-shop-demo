@@ -31,8 +31,7 @@ data "kubectl_path_documents" "utility-manifests" {
         reg_server = var.reg_server,
         registry_config_json = var.registry_config_json,
         target_url = var.target_url,
-        app_namespace = var.app_namespace,
-        app_kubecfg = var.app_kubecfg
+        app_namespace = var.app_namespace
     }
 }
 
@@ -53,9 +52,13 @@ resource "kubectl_manifest" "utility-resources" {
 //Treating this one diff as it's contents aren't know until apply
 data "kubectl_file_documents" "cleaner" {
     content = file("${path.module}/utility-manifests/clean.yml")
+    vars = {
+        app_kubecfg = var.app_kubecfg
+    }
 }
 
 resource "kubectl_manifest" "cleaner" {
-    for_each  = data.kubectl_file_documents.cleaner.manifests
-    yaml_body = each.value
+  provider  = kubectl.utility
+  for_each  = data.kubectl_file_documents.cleaner.manifests
+  yaml_body = each.value
 }
