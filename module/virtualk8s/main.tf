@@ -30,7 +30,9 @@ data "kubectl_path_documents" "utility-manifests" {
         utility_vsite = var.utility_vsite,
         reg_server = var.reg_server,
         registry_config_json = var.registry_config_json,
-        target_url = var.target_url
+        target_url = var.target_url,
+        app_namespace = var.app_namespace,
+        app_kubecfg = var.app_kubecfg
     }
 }
 resource "kubectl_manifest" "app-resources" {

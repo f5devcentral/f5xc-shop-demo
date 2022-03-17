@@ -67,6 +67,7 @@ module "virtualk8s" {
   hub_vsite = module.f5xc.hub_vsite
   utility_vsite = module.f5xc.utility_vsite
   target_url = module.f5xc.app_url
+  app_kubecfg = module.f5xc.app_kubecfg
 
   tenant_js_ref = var.tenant_js_ref
 }

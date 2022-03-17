@@ -24,3 +24,6 @@ variable "utility_vsite" {
 
 variable "target_url" {
 }
+
+variable "app_kubecfg" {
+}

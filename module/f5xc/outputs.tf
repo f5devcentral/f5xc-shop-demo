@@ -28,18 +28,18 @@ output "utility_vsite" {
   value       = volterra_virtual_site.utility.name
 }
 
-output "app_kubecfg_host" {
-  description = "host value from app kubeconfig"
-  value       = yamldecode(base64decode(volterra_api_credential.app_vk8s_cred.data))["clusters"][0]["cluster"]["server"]
-  sensitive   = false
-}
-
 output "app_vk8s" {
   value = volterra_virtual_k8s.app_vk8s.id
 }
 
 output "utility_vk8s" {
   value = volterra_virtual_k8s.utility_vk8s.id
+}
+
+output "app_kubecfg_host" {
+  description = "host value from app kubeconfig"
+  value       = yamldecode(base64decode(volterra_api_credential.app_vk8s_cred.data))["clusters"][0]["cluster"]["server"]
+  sensitive   = false
 }
 
 output "app_kubecfg_cluster_ca" {
@@ -81,5 +81,11 @@ output "utility_kubecfg_client_cert" {
 output "utility_kubecfg_client_key" {
   description = "client key value from app kubeconfig"
   value       = yamldecode(base64decode(volterra_api_credential.utility_vk8s_cred.data))["users"][0]["user"]["client-key-data"]
+  sensitive   = true
+}
+
+output "app_kubecfg" {
+  description = "complete app kubeconfig"
+  value       = volterra_api_credential.app_vk8s_cred.data
   sensitive   = true
 }
