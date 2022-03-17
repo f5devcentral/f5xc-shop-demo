@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-kubecfg
   annotations:
-    ves.io/virtual-sites: ${namespace}/${utility_vsite}
+    ves.io/virtual-sites: ${utility_namespace}/${utility_vsite}
 data:
   kubeconfig: |
     ${app_kubecfg}
