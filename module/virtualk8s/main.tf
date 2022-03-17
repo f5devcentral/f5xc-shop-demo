@@ -12,10 +12,6 @@ terraform {
   }
 }
 
-data "local_sensitive_file" "app_kubecfg" {
-    filename = "${path.module}/../../kubeconfig"
-}
-
 data "kubectl_path_documents" "app-manifests" {
     provider = kubectl.app
     pattern  = "${path.module}/app-manifests/*.yaml"
@@ -40,7 +36,7 @@ data "kubectl_path_documents" "utility-manifests" {
         registry_config_json = var.registry_config_json,
         target_url = var.target_url,
         app_namespace = var.app_namespace
-        app_kubecfg = base64decode(var.app_kubecfg)
+        app_kubecfg = base64decode(var.app_kubecfg.content)
     }
 }
 
