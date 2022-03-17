@@ -6,7 +6,7 @@ metadata:
     ves.io/virtual-sites: ${utility_namespace}/${utility_vsite}
 data:
   kubeconfig: |
-    ${app_kubecfg}
+    blarghs
  
 ---
 apiVersion: batch/v1beta1

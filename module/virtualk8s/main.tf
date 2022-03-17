@@ -32,7 +32,7 @@ data "kubectl_path_documents" "utility-manifests" {
         registry_config_json = var.registry_config_json,
         target_url = var.target_url,
         app_namespace = var.app_namespace,
-        app_kubecfg = var.app_kubecfg
+        //app_kubecfg = var.app_kubecfg
     }
 }
 
