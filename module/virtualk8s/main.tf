@@ -17,7 +17,7 @@ data "kubectl_path_documents" "app-manifests" {
         hub_vsite = var.hub_vsite,
         reg_server = var.reg_server,
         registry_config_json = var.registry_config_json,
-        reg_server = var.reg_server
+        reg_server = var.reg_server,
         tenant_js_ref = var.tenant_js_ref
     }
 }
