@@ -4,7 +4,11 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
       configuration_aliases = [kubectl.app, kubectl.utility]
-    }    
+    }   
+    local = {
+      source = "hashicorp/local"
+      version = "2.2.2"
+    } 
   }
 }
 
