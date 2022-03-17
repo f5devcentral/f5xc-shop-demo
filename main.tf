@@ -9,14 +9,7 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
     }
-    local = {
-      source = "hashicorp/local"
-      version = "2.2.2"
-    }
   }
-}
-
-provider "local" {
 }
 
 provider "volterra" {
@@ -60,6 +53,9 @@ module "f5xc" {
  
 module "virtualk8s" {
   source = "./module/virtualk8s"
+  depends_on = [
+    module.f5xc
+  ]
   providers = {
     kubectl.app     = kubectl.app
     kubectl.utility = kubectl.utility

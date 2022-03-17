@@ -5,10 +5,6 @@ terraform {
       version = ">= 1.7.0"
       configuration_aliases = [kubectl.app, kubectl.utility]
     }   
-    local = {
-      source = "hashicorp/local"
-      version = "2.2.2"
-    } 
   }
 }
 
@@ -36,7 +32,7 @@ data "kubectl_path_documents" "utility-manifests" {
         registry_config_json = var.registry_config_json,
         target_url = var.target_url,
         app_namespace = var.app_namespace
-        app_kubecfg = base64decode(var.app_kubecfg.content)
+        app_kubecfg = var.app_kubecfg
     }
 }
 

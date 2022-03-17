@@ -4,10 +4,6 @@ terraform {
       source = "volterraedge/volterra"
       version = "0.11.3"
     }
-    local = {
-      source = "hashicorp/local"
-      version = "2.2.2"
-    }
   }
 }
 
@@ -133,11 +129,6 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   virtual_k8s_namespace = volterra_namespace.app_ns.name
   virtual_k8s_name = volterra_virtual_k8s.app_vk8s.name
   expiry_days = var.cred_expiry_days
-}
-
-resource "local_sensitive_file" "app_kubecfg" {
-    content  = volterra_api_credential.app_vk8s_cred.data
-    filename = "${path.module}/../../kubeconfig"
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
