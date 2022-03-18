@@ -21,7 +21,7 @@ resource "kubernetes_deployment" "redis_cart" {
       spec {
         volume {
           name      = "redis-data"
-          empty_dir = "{}"
+          empty_dir {}
         }
         container {
           name  = "redis"
