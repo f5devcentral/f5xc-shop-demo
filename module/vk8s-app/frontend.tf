@@ -32,7 +32,7 @@ resource "kubernetes_config_map_v1" "error_html" {
 }
 
 resource "kubernetes_deployment_v1" "frontend" {
-  depends_on = [kubernetes_secret.registry-secret]
+  depends_on = [kubernetes_secret_v1.registry-secret]
   metadata {
     name = "frontend"
     namespace = var.namespace

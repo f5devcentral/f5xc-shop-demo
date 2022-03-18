@@ -1,5 +1,5 @@
 resource "kubernetes_cron_job_v1" "shop_traffic_gen" {
-  depends_on = [kubernetes_secret.registry-secret]
+  depends_on = [kubernetes_secret_v1.registry-secret]
   metadata {
     name = "shop-traffic-gen"
     namespace = var.namespace
