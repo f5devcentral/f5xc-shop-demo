@@ -1,6 +1,7 @@
 resource "kubernetes_deployment" "redis_cart" {
   metadata {
     name = "redis-cart"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.hub_vsite}"
       "ves.io/workload-flavor" = "ves-io-medium"
@@ -59,6 +60,7 @@ resource "kubernetes_deployment" "redis_cart" {
 resource "kubernetes_service" "redis_cart" {
   metadata {
     name = "redis-cart"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.hub_vsite}"
     }

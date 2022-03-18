@@ -8,6 +8,7 @@ data "template_file" "nginx_conf" {
 resource "kubernetes_config_map" "nginx_conf" {
   metadata {
     name = "nginx-conf"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
     }
@@ -20,6 +21,7 @@ resource "kubernetes_config_map" "nginx_conf" {
 resource "kubernetes_config_map" "error_html" {
   metadata {
     name = "error-html"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
     }

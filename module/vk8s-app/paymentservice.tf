@@ -1,6 +1,7 @@
 resource "kubernetes_deployment" "paymentservice" {
   metadata {
     name = "paymentservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
       "ves.io/workload-flavor" = "ves-io-tiny"
@@ -64,6 +65,7 @@ resource "kubernetes_deployment" "paymentservice" {
 resource "kubernetes_service" "paymentservice" {
   metadata {
     name = "paymentservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/http2-enable" = "true"
       "ves.io/proxy-type" = "HTTP_PROXY"

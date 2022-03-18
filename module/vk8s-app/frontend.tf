@@ -1,6 +1,7 @@
 resource "kubernetes_deployment" "frontend" {
   metadata {
     name = "frontend"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
       "ves.io/workload-flavor" = "ves-io-tiny"
@@ -155,6 +156,7 @@ resource "kubernetes_deployment" "frontend" {
 resource "kubernetes_service" "frontend" {
   metadata {
     name = "frontend"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
     }

@@ -1,6 +1,7 @@
 resource "kubernetes_deployment" "emailservice" {
   metadata {
     name = "emailservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
       "ves.io/workload-flavor" = "ves-io-tiny"
@@ -68,6 +69,7 @@ resource "kubernetes_deployment" "emailservice" {
 resource "kubernetes_service" "emailservice" {
   metadata {
     name = "emailservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/http2-enable" = "true"
       "ves.io/proxy-type" = "HTTP_PROXY"

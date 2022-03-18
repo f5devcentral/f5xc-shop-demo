@@ -1,6 +1,7 @@
 resource "kubernetes_cron_job" "shop_traffic_gen" {
   metadata {
     name = "shop-traffic-gen"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
     }

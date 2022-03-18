@@ -1,6 +1,7 @@
 resource "kubernetes_deployment" "adservice" {
   metadata {
     name = "adservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.hub_vsite}"
       "ves.io/workload-flavor" = "ves-io-medium"
@@ -66,6 +67,7 @@ resource "kubernetes_deployment" "adservice" {
 resource "kubernetes_service" "adservice" {
   metadata {
     name = "adservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.hub_vsite}"
     }

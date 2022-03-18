@@ -1,6 +1,7 @@
 resource "kubernetes_deployment" "cartservice" {
   metadata {
     name = "cartservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
       "ves.io/workload-flavor" = "ves-io-medium"
@@ -55,6 +56,7 @@ resource "kubernetes_deployment" "cartservice" {
 resource "kubernetes_service" "cartservice" {
   metadata {
     name = "cartservice"
+    namespace = var.namespace
     annotations = {
       "ves.io/http2-enable" = "true"
       "ves.io/proxy-type" = "HTTP_PROXY"

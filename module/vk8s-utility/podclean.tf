@@ -1,6 +1,7 @@
 resource "kubernetes_config_map" "app_kubecfg" {
   metadata {
     name = "app-kubecfg"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
     }
@@ -13,6 +14,7 @@ resource "kubernetes_config_map" "app_kubecfg" {
 resource "kubernetes_cron_job" "podcleaner" {
   metadata {
     name = "podcleaner"
+    namespace = var.namespace
     annotations = {
       "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
     }
