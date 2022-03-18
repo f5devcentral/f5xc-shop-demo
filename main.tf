@@ -9,6 +9,11 @@ terraform {
       source = "hashicorp/kubernetes"
       version = "2.8.0"
     }
+    //Need this to destroy -- remove later
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
+    }
   }
 }
 
