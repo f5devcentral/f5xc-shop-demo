@@ -7,7 +7,7 @@ resource "kubernetes_config_map_v1" "app_kubecfg" {
     }
   }
   data = {
-    kubeconfig = "${var.app_kubecfg}"
+    kubeconfig = base64decode(var.app_kubecfg)
   }
 }
 
