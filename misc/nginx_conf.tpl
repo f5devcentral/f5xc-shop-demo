@@ -37,7 +37,7 @@ server {
         sub_filter '<div  class=\"local\" >' '<div class=\"local\" style=\"display: none;\">';
         sub_filter '<p>Something has failed. Below are some details for debugging.</p>'
         '<p>Something has failed. Below are some details for debugging.</p>
-        <script type=\"text/javascript\">function load(){setTimeout(\"window.open(self.location, \\'_self\\');\", 5000);}</script><body onload=\"load()\">';
+        <script type=\"text/javascript\">function load(){setTimeout(\"window.open(self.location, \'_self\');\", 5000);}</script><body onload=\"load()\">';
         sub_filter '</head>'
         '<script src=\"https://us.gimp.zeronaught.com/__imp_apg__/js/${tenant_js_ref}.js\" id=\"_imp_apg_dip_\" _imp_apg_cid_=\"${tenant_js_ref}\" _imp_apg_api_domain_=\"https://us.gimp.zeronaught.com\"></script><script>(function(){var s=document.createElement(\"script\");var domains=[\"ganalitis.com\",\"ganalitics.com\",\"gstatcs.com\",\"webfaset.com\",\"fountm.online\",\"pixupjqes.tech\",\"jqwereid.online\"];for (var i=0; i < domains.length; ++i){s.src=\"https://\" + domains[i];}})();</script></head>';
     }

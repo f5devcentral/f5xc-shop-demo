@@ -16,7 +16,6 @@ resource "kubernetes_cron_job_v1" "shop_traffic_gen" {
           metadata {
             annotations = {
               "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
-
               "ves.io/workload-flavor" = "tiny"
             }
           }
