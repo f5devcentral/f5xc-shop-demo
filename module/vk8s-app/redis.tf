@@ -50,6 +50,7 @@ resource "kubernetes_deployment_v1" "redis_cart" {
             period_seconds        = 5
           }
         }
+        service_account_name      = "default"
         image_pull_secrets {
           name = "f5demos-registry-secret"
         }

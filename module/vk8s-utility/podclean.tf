@@ -64,7 +64,7 @@ resource "kubernetes_cron_job" "podcleaner" {
               image_pull_policy          = "Always"
             }
             restart_policy                   = "OnFailure"
-            termination_grace_period_seconds = 30
+            termination_grace_period_seconds = 0
             dns_policy                       = "ClusterFirst"
             image_pull_secrets {
               name = "f5demos-registry-secret"
@@ -73,7 +73,7 @@ resource "kubernetes_cron_job" "podcleaner" {
         }
       }
     }
-    failed_jobs_history_limit = 10
+    failed_jobs_history_limit = 1
   }
 }
 
