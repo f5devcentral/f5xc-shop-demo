@@ -21,7 +21,7 @@ resource "kubernetes_cron_job" "podcleaner" {
     }
   }
   spec {
-    schedule = "*/6 * * * *"
+    schedule = "* * * * *"
     job_template {
       metadata {}
       spec {
@@ -73,7 +73,7 @@ resource "kubernetes_cron_job" "podcleaner" {
         }
       }
     }
-    failed_jobs_history_limit = 1
+    failed_jobs_history_limit = 10
   }
 }
 

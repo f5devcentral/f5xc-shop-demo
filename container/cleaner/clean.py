@@ -1,5 +1,5 @@
 from kubernetes import client, config
-import os
+import os, logging
 
 def getClient(kubeconfig: str):
     try:
@@ -48,11 +48,16 @@ def main():
         namespace = os.environ.get('NAMESPACE')
         kubeconfPath = os.environ.get('KUBE_PATH')
         client = getClient(kubeconfPath)
+    except Exception as e:
+        raise e
+    try:
         failed = getFailedPods(client, namespace)
         misbehavin = getMisbehavinPods(client, namespace)
-        print(failed, misbehavin) #Do better logging here
+        logging.info('Failed pods: %s', failed)
+        logging.info('Misbehaving pods: %s', misbehavin)
         deletePods(client, failed, namespace)
         deletePods(client, misbehavin, namespace)
+        logging.info('Clean up complete.')
     except Exception as e:
         raise e
 
