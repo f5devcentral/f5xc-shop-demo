@@ -368,8 +368,8 @@ resource "volterra_http_loadbalancer" "frontend" {
   }
   more_option {
     custom_errors = {
-      408 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html")),
-      503 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html"))      
+      408 : format("string:///%s", filebase64("${path.module}/../../misc/error.html")),
+      503 : format("string:///%s", filebase64("${path.module}/../../misc/error.html"))      
     }
     idle_timeout = 5000
   }
