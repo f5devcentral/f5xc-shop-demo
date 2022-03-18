@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    volterra = {
-      source = "volterraedge/volterra"
-      version = "0.11.3"
-    }
-  }
-}
-
 resource "null_resource" "pip" {
   triggers = {
       build_number = "${timestamp()}"

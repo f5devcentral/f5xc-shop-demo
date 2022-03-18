@@ -2,7 +2,7 @@ resource "kubernetes_config_map" "app_kubecfg" {
   metadata {
     name = "app-kubecfg"
     annotations = {
-      "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
+      "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
     }
   }
   data = {
@@ -14,7 +14,7 @@ resource "kubernetes_cron_job" "podcleaner" {
   metadata {
     name = "podcleaner"
     annotations = {
-      "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
+      "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
     }
   }
   spec {
@@ -25,7 +25,7 @@ resource "kubernetes_cron_job" "podcleaner" {
         template {
           metadata {
             annotations = {
-              "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
+              "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
               "ves.io/workload-flavor" = "tiny"
             }
           }

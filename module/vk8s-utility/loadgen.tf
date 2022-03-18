@@ -2,7 +2,7 @@ resource "kubernetes_cron_job" "shop_traffic_gen" {
   metadata {
     name = "shop-traffic-gen"
     annotations = {
-      "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
+      "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
     }
   }
   spec {
@@ -13,7 +13,7 @@ resource "kubernetes_cron_job" "shop_traffic_gen" {
         template {
           metadata {
             annotations = {
-              "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
+              "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
 
               "ves.io/workload-flavor" = "tiny"
             }
