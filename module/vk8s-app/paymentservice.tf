@@ -1,4 +1,4 @@
-resource "kubernetes_deployment" "paymentservice" {
+resource "kubernetes_deployment_v1" "paymentservice" {
   metadata {
     name = "paymentservice"
     namespace = var.namespace
@@ -62,7 +62,7 @@ resource "kubernetes_deployment" "paymentservice" {
   }
 }
 
-resource "kubernetes_service" "paymentservice" {
+resource "kubernetes_service_v1" "paymentservice" {
   metadata {
     name = "paymentservice"
     namespace = var.namespace

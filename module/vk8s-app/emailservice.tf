@@ -1,4 +1,4 @@
-resource "kubernetes_deployment" "emailservice" {
+resource "kubernetes_deployment_v1" "emailservice" {
   metadata {
     name = "emailservice"
     namespace = var.namespace
@@ -66,7 +66,7 @@ resource "kubernetes_deployment" "emailservice" {
   }
 }
 
-resource "kubernetes_service" "emailservice" {
+resource "kubernetes_service_v1" "emailservice" {
   metadata {
     name = "emailservice"
     namespace = var.namespace

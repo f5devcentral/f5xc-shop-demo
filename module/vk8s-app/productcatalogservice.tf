@@ -1,4 +1,4 @@
-resource "kubernetes_deployment" "productcatalogservice" {
+resource "kubernetes_deployment_v1" "productcatalogservice" {
   metadata {
     name = "productcatalogservice"
     namespace = var.namespace
@@ -62,7 +62,7 @@ resource "kubernetes_deployment" "productcatalogservice" {
   }
 }
 
-resource "kubernetes_service" "productcatalogservice" {
+resource "kubernetes_service_v1" "productcatalogservice" {
   metadata {
     name = "productcatalogservice"
     namespace = var.namespace

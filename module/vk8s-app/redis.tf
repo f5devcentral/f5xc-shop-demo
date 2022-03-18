@@ -1,4 +1,4 @@
-resource "kubernetes_deployment" "redis_cart" {
+resource "kubernetes_deployment_v1" "redis_cart" {
   depends_on = [kubernetes_secret.registry-secret]
   metadata {
     name = "redis-cart"
@@ -58,7 +58,7 @@ resource "kubernetes_deployment" "redis_cart" {
   }
 }
 
-resource "kubernetes_service" "redis_cart" {
+resource "kubernetes_service_v1" "redis_cart" {
   metadata {
     name = "redis-cart"
     namespace = var.namespace

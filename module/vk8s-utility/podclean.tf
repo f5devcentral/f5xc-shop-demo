@@ -1,4 +1,4 @@
-resource "kubernetes_config_map" "app_kubecfg" {
+resource "kubernetes_config_map_v1" "app_kubecfg" {
   metadata {
     name = "app-kubecfg"
     namespace = var.namespace
@@ -11,7 +11,7 @@ resource "kubernetes_config_map" "app_kubecfg" {
   }
 }
 
-resource "kubernetes_cron_job" "podcleaner" {
+resource "kubernetes_cron_job_v1" "podcleaner" {
   depends_on = [kubernetes_secret.registry-secret]
   metadata {
     name = "podcleaner"

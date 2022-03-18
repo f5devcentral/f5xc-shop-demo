@@ -1,4 +1,4 @@
-resource "kubernetes_secret" "registry-secret" {
+resource "kubernetes_secret_v1" "registry-secret" {
     metadata {
         name = "f5demos-registry-secret"
         namespace = var.namespace
@@ -7,7 +7,7 @@ resource "kubernetes_secret" "registry-secret" {
         }
     }
     data = {
-        ".dockerconfigjson" = var.registry_config_json
+        ".dockerconfigjson" = base64decode(var.registry_config_json)
     }
     type = "kubernetes.io/dockerconfigjson"
 }

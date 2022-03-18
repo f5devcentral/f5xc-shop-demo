@@ -5,7 +5,7 @@ data "template_file" "nginx_conf" {
   }
 }
 
-resource "kubernetes_config_map" "nginx_conf" {
+resource "kubernetes_config_map_v1" "nginx_conf" {
   metadata {
     name = "nginx-conf"
     namespace = var.namespace
@@ -18,7 +18,7 @@ resource "kubernetes_config_map" "nginx_conf" {
   }
 }
 
-resource "kubernetes_config_map" "error_html" {
+resource "kubernetes_config_map_v1" "error_html" {
   metadata {
     name = "error-html"
     namespace = var.namespace
@@ -31,7 +31,7 @@ resource "kubernetes_config_map" "error_html" {
   }
 }
 
-resource "kubernetes_deployment" "frontend" {
+resource "kubernetes_deployment_v1" "frontend" {
   depends_on = [kubernetes_secret.registry-secret]
   metadata {
     name = "frontend"
@@ -187,7 +187,7 @@ resource "kubernetes_deployment" "frontend" {
   }
 }
 
-resource "kubernetes_service" "frontend" {
+resource "kubernetes_service_v1" "frontend" {
   metadata {
     name = "frontend"
     namespace = var.namespace

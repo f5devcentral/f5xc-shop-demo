@@ -1,4 +1,4 @@
-resource "kubernetes_deployment" "checkoutservice" {
+resource "kubernetes_deployment_v1" "checkoutservice" {
   metadata {
     name = "checkoutservice"
     namespace = var.namespace
@@ -87,7 +87,7 @@ resource "kubernetes_deployment" "checkoutservice" {
   }
 }
 
-resource "kubernetes_service" "checkoutservice" {
+resource "kubernetes_service_v1" "checkoutservice" {
   metadata {
     name = "checkoutservice"
     namespace = var.namespace
