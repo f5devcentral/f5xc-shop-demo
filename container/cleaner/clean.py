@@ -1,5 +1,5 @@
 from kubernetes import client, config
-import os, logging
+import os, logging, sys
 
 def getClient(kubeconfig: str):
     try:
@@ -44,6 +44,7 @@ def deletePods(client, podNames: list, namespace: str) -> None:
         raise e
 
 def main():
+    logging.basicConfig(format='%(levelname)s:%(message)s', stream=sys.stdout, level=logging.INFO)
     try:
         namespace = os.environ.get('NAMESPACE')
         kubeconfPath = os.environ.get('KUBE_PATH')
