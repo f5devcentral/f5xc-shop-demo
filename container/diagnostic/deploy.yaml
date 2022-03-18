@@ -1,0 +1,30 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: diagnostic
+  annotations:
+    ves.io/workload-flavor: ves-io-tiny
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: diagnostic
+  template:
+    metadata:
+      labels:
+        app: kubectl
+    spec:
+      containers:
+        - name: server
+          image: f5demos.azurecr.io/diagnostic
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - sleep 3600
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: f5demos-registry-secret
+
+  
