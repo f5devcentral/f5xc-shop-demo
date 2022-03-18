@@ -48,7 +48,6 @@ resource "kubernetes_deployment_v1" "emailservice" {
             }
             initial_delay_seconds = 10
             timeout_seconds       = 2
-            period_seconds        = 5
           }
           readiness_probe {
             exec {
@@ -56,7 +55,6 @@ resource "kubernetes_deployment_v1" "emailservice" {
             }
             initial_delay_seconds = 5
             timeout_seconds       = 2
-            period_seconds        = 5
           }
         }
         termination_grace_period_seconds = 5

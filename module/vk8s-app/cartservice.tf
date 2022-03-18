@@ -34,15 +34,14 @@ resource "kubernetes_deployment_v1" "cartservice" {
             exec {
               command = ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
             }
-            initial_delay_seconds = 20
+            initial_delay_seconds = 10
             timeout_seconds       = 2
-            period_seconds        = 10
           }
           readiness_probe {
             exec {
               command = ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
             }
-            initial_delay_seconds = 10
+            initial_delay_seconds = 5
             timeout_seconds       = 2
           }
         }
