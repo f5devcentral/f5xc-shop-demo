@@ -83,3 +83,23 @@ module "vk8s-utility" {
   registry_config_json  = var.registry_config_json
 }
 
+//Is this enough to destroy?
+provider "kubectl" {
+  alias                  = "app"
+  host                   = module.f5xc.app_kubecfg_host
+  cluster_ca_certificate = base64decode(module.f5xc.app_kubecfg_cluster_ca)
+  client_certificate     = base64decode(module.f5xc.app_kubecfg_client_cert)
+  client_key             = base64decode(module.f5xc.app_kubecfg_client_key)
+  load_config_file       = false
+  apply_retry_count      = 10
+}
+
+provider "kubectl" {
+  alias                  = "utility"
+  host                   = module.f5xc.utility_kubecfg_host
+  cluster_ca_certificate = base64decode(module.f5xc.utility_kubecfg_cluster_ca)
+  client_certificate     = base64decode(module.f5xc.utility_kubecfg_client_cert)
+  client_key             = base64decode(module.f5xc.utility_kubecfg_client_key)
+  load_config_file       = false
+  apply_retry_count      = 10
+}
