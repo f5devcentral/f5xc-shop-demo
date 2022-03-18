@@ -25,7 +25,7 @@ resource "kubernetes_deployment" "redis_cart" {
         }
         container {
           name  = "redis"
-          image = "${var.reg_server}/redis:alpine"
+          image = "${var.registry_server}/redis:alpine"
           port {
             container_port = 6379
           }

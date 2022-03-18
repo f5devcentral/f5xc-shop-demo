@@ -58,7 +58,7 @@ resource "kubernetes_service" "cartservice" {
     annotations = {
       "ves.io/http2-enable" = "true"
       "ves.io/proxy-type" = "HTTP_PROXY"
-      "ves.io/virtual-sites" = "${var.namepace}/${var.spoke_vsite}"
+      "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
     }
   }
   spec {

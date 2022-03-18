@@ -114,7 +114,7 @@ resource "kubernetes_deployment" "frontend" {
         }
         container {
           name  = "proxy"
-          image = "${var.reg_server}/proxy"
+          image = "${var.registry_server}/proxy"
           port {
             container_port = 8181
           }

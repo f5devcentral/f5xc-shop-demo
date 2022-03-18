@@ -7,7 +7,7 @@ variable "spoke_vsite" {
 variable "hub_vsite" {
 }
 
-variable "reg_server" {
+variable "registry_server" {
 }
 
 variable "registry_config_json" {

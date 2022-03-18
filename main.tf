@@ -57,7 +57,7 @@ module "vk8s-app" {
   spoke_vsite   = module.f5xc.spoke_vsite
   hub_vsite     = module.f5xc.hub_vsite
 
-  reg_server            = var.reg_server
+  reg_server            = var.registry_server
   registry_config_json  = var.registry_config_json
   tenant_js_ref         = var.tenant_js_ref
 }
@@ -74,7 +74,7 @@ module "vk8s-utility" {
   target_url      = module.f5xc.app_url
   app_kubecfg     = module.f5xc.app_kubecfg
 
-  reg_server            = var.reg_server
+  reg_server            = var.registry_server
   registry_config_json  = var.registry_config_json
 }
 

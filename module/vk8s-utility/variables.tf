@@ -13,7 +13,7 @@ variable "target_url" {
 variable "app_kubecfg" {
 }
 
-variable "reg_server" {
+variable "registry_server" {
 }
 
 variable "registry_config_json" {

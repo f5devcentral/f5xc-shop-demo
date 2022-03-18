@@ -42,7 +42,7 @@ resource "kubernetes_cron_job" "podcleaner" {
             }
             container {
               name  = "cleaner"
-              image = "${var.reg_server}/cleaner"
+              image = "${var.registry_server}/cleaner"
               env {
                 name  = "NAMESPACE"
                 value = "${var.app_namespace}"

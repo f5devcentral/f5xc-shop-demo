@@ -21,7 +21,7 @@ resource "kubernetes_cron_job" "shop_traffic_gen" {
           spec {
             container {
               name  = "shop-traffic-gen"
-              image = "${var.reg_server}/loadgen"
+              image = "${var.registry_server}/loadgen"
               env {
                 name  = "DURATION"
                 value = "5m"
