@@ -1,3 +1,10 @@
+data "template_file" "nginx_conf" {
+  template = "${file("${path.module}/../../misc/nginx_conf.tpl")}"
+  vars = {
+    tenant_js_ref  = var.tenant_js_ref
+  }
+}
+
 resource "kubernetes_config_map" "nginx_conf" {
   metadata {
     name = "nginx-conf"
@@ -6,7 +13,7 @@ resource "kubernetes_config_map" "nginx_conf" {
     }
   }
   data = {
-    "default.conf" = "map $sent_http_content_type $expires {\n    default                    off;\n    text/html                  epoch;\n    text/css                   max;\n    application/javascript     1d;\n    ~image/                    1d;\n}\nexpires $expires;\nupstream backend {\n    server 127.0.0.1:8080  max_fails=0;\n    keepalive 16;\n    keepalive_time 1h;\n}\nserver {\n    listen 8181;\n    listen [::]:8181;\n    location = /_healthy {\n        access_log off;\n        add_header Content-Type text/plain;\n        return 200 'OK';\n    }\n    location /error.html {\n        root /usr/share/nginx/html;\n    }\n    location /__imp_apg__/ {\n        proxy_pass https://dip.zeronaught.com;\n    }\n    location / {\n        proxy_set_header Accept-Encoding \"\";\n        proxy_http_version 1.1;\n        proxy_set_header Connection \"\";\n        proxy_pass http://backend;\n        error_page 502 503 504 /error.html;\n        sub_filter_once on;\n        sub_filter '<div class=\"h-free-shipping\">' \n        '<div class=\"h-free-shipping\">F5XC Microservices Demo</div><div class=\"h-free-shipping\" style=\"display: none;\">';\n        sub_filter '<div  class=\"local\" >' '<div class=\"local\" style=\"display: none;\">';\n        sub_filter '<p>Something has failed. Below are some details for debugging.</p>'\n        '<p>Something has failed. Below are some details for debugging.</p>\n        <script type=\"text/javascript\">function load(){setTimeout(\"window.open(self.location, \\'_self\\');\", 5000);}</script><body onload=\"load()\">';\n        sub_filter '</head>'\n        '<script src=\"https://us.gimp.zeronaught.com/__imp_apg__/js/${var.tenant_js_ref}.js\" id=\"_imp_apg_dip_\" _imp_apg_cid_=\"${var.tenant_js_ref}\" _imp_apg_api_domain_=\"https://us.gimp.zeronaught.com\"></script><script>(function(){var s=document.createElement(\"script\");var domains=[\"ganalitis.com\",\"ganalitics.com\",\"gstatcs.com\",\"webfaset.com\",\"fountm.online\",\"pixupjqes.tech\",\"jqwereid.online\"];for (var i=0; i < domains.length; ++i){s.src=\"https://\" + domains[i];}})();</script></head>';\n    }\n}\n"
+    "default.conf" = data.template_file.nginx_conf.rendered
   }
 }
 
@@ -18,7 +25,7 @@ resource "kubernetes_config_map" "error_html" {
     }
   }
   data = {
-    "error.html" = "<!DOCTYPE html><html lang=\"en\"><head> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, shrink-to-fit=no\"> <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\"> <title>Online Boutique </title> <link href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB\" crossorigin=\"anonymous\"> <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"> <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin> <link href=\"https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap\" rel=\"stylesheet\"> <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/styles/styles.css\"> <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/styles/cart.css\"> <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/styles/order.css\"> <link rel='shortcut icon' type='image/x-icon' href='/static/favicon.ico'/> <body> <header> <div class=\"navbar\"> <div class=\"container d-flex justify-content-center\"> <div class=\"h-free-shipping\">F5XC Microservices Demo</div></div></div><div class=\"navbar sub-navbar\"> <div class=\"container d-flex justify-content-between\"> <a href=\"/\" class=\"navbar-brand d-flex align-items-center\"> <img src=\"/static/icons/Hipster_NavLogo.svg\" alt=\"\" class=\"top-left-logo\"/> </a> <div class=\"controls\"> <a href=\"/cart\" class=\"cart-link\"> <img src=\"/static/icons/Hipster_CartIcon.svg\" alt=\"Cart icon\" class=\"logo\" title=\"Cart\"/> </a> </div></div></div></header> <div > <span class=\"platform-flag\"> </span> </div><main role=\"main\"> <div class=\"py-5\"> <div class=\"container bg-light py-3 px-lg-5 py-lg-5\"> <h1>Uh, oh!</h1> <p>Something has failed. Let's try again in a few seconds.</p></div></div><script type=\"text/javascript\">function load(){setTimeout(\"window.open(self.location, '_self');\", 5000);}</script> <body onload=\"load()\"> </main><footer class=\"py-5\"> <div class=\"footer-top\"> <div class=\"container footer-social\"> <p class=\"footer-text\">This website is hosted for demo purposes only. It is not an actual shop. This is not a Google product.</p><p class=\"footer-text\">© 2020 Google Inc (<a href=\"https://github.com/GoogleCloudPlatform/microservices-demo\">Source Code</a>)</p></div></div></footer><script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\" integrity=\"sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T\" crossorigin=\"anonymous\"></script></body></html>\n"
+    "error.html" = file("${path.module}/../../misc/error.html")
   }
 }
 
