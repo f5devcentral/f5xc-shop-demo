@@ -3,7 +3,7 @@ resource "kubernetes_secret" "registry-secret" {
         name = "f5demos-registry-secret"
         namespace = var.namespace
         annotations = {
-            "ves.io/virtual-sites" = "$${namespace}/$${spoke_vsite}"
+            "ves.io/virtual-sites" = "${var.namespace}/${var.spoke_vsite}"
         }
     }
     data = {

@@ -2,7 +2,7 @@ resource "kubernetes_cron_job" "shop_traffic_gen" {
   metadata {
     name = "shop-traffic-gen"
     annotations = {
-      "ves.io/virtual-sites" = "$${utility_namespace}/$${utility_vsite}"
+      "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
     }
   }
   spec {
@@ -13,7 +13,7 @@ resource "kubernetes_cron_job" "shop_traffic_gen" {
         template {
           metadata {
             annotations = {
-              "ves.io/virtual-sites" = "$${utility_namespace}/$${utility_vsite}"
+              "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
 
               "ves.io/workload-flavor" = "tiny"
             }
@@ -21,14 +21,14 @@ resource "kubernetes_cron_job" "shop_traffic_gen" {
           spec {
             container {
               name  = "shop-traffic-gen"
-              image = "$${reg_server}/loadgen"
+              image = "${var.reg_server}/loadgen"
               env {
                 name  = "DURATION"
                 value = "5m"
               }
               env {
                 name  = "TARGET_URL"
-                value = "$${target_url}"
+                value = "${var.target_url}"
               }
               termination_message_path   = "/dev/termination-log"
               termination_message_policy = "File"

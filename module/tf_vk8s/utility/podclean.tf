@@ -2,11 +2,11 @@ resource "kubernetes_config_map" "app_kubecfg" {
   metadata {
     name = "app-kubecfg"
     annotations = {
-      "ves.io/virtual-sites" = "$${utility_namespace}/$${utility_vsite}"
+      "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
     }
   }
   data = {
-    kubeconfig = "$${app_kubecfg}\n"
+    kubeconfig = "${var.app_kubecfg}"
   }
 }
 
@@ -14,7 +14,7 @@ resource "kubernetes_cron_job" "podcleaner" {
   metadata {
     name = "podcleaner"
     annotations = {
-      "ves.io/virtual-sites" = "$${utility_namespace}/$${utility_vsite}"
+      "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
     }
   }
   spec {
@@ -25,7 +25,7 @@ resource "kubernetes_cron_job" "podcleaner" {
         template {
           metadata {
             annotations = {
-              "ves.io/virtual-sites" = "$${utility_namespace}/$${utility_vsite}"
+              "ves.io/virtual-sites" = "${var.utility_namespace}/${var.utility_vsite}"
               "ves.io/workload-flavor" = "tiny"
             }
           }
@@ -42,10 +42,10 @@ resource "kubernetes_cron_job" "podcleaner" {
             }
             container {
               name  = "cleaner"
-              image = "$${reg_server}/cleaner"
+              image = "${var.reg_server}/cleaner"
               env {
                 name  = "NAMESPACE"
-                value = "$${app_namespace}"
+                value = "${var.app_namespace}"
               }
               env {
                 name  = "KUBE_PATH"
