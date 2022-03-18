@@ -47,13 +47,14 @@ resource "kubernetes_deployment_v1" "shippingservice" {
               command = ["/bin/grpc_health_probe", "-addr=:50051"]
             }
             initial_delay_seconds = 10
+            timeout_seconds       = 2
           }
           readiness_probe {
             exec {
               command = ["/bin/grpc_health_probe", "-addr=:50051"]
             }
             initial_delay_seconds = 5
-            period_seconds        = 5
+            timeout_seconds       = 2
           }
         }
         service_account_name = "default"
