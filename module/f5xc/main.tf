@@ -1,5 +1,4 @@
 terraform {
-  required_version = ">= 0.15"
   required_providers {
     volterra = {
       source = "volterraedge/volterra"
@@ -130,7 +129,6 @@ resource "volterra_api_credential" "app_vk8s_cred" {
   virtual_k8s_namespace = volterra_namespace.app_ns.name
   virtual_k8s_name = volterra_virtual_k8s.app_vk8s.name
   expiry_days = var.cred_expiry_days
-
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
@@ -139,7 +137,6 @@ resource "volterra_api_credential" "utility_vk8s_cred" {
   virtual_k8s_namespace = volterra_namespace.utility_ns.name
   virtual_k8s_name = volterra_virtual_k8s.utility_vk8s.name
   expiry_days = var.cred_expiry_days
- 
 }
 
 resource "volterra_app_type" "at" {
@@ -371,8 +368,8 @@ resource "volterra_http_loadbalancer" "frontend" {
   }
   more_option {
     custom_errors = {
-      408 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html")),
-      503 : format("string:///%s", filebase64("${path.module}/../../misc/error-page.html"))      
+      408 : format("string:///%s", filebase64("${path.module}/../../misc/error.html")),
+      503 : format("string:///%s", filebase64("${path.module}/../../misc/error.html"))      
     }
     idle_timeout = 5000
   }
