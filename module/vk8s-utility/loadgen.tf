@@ -1,4 +1,4 @@
-resource "kubectl_manifest" "podcleaner_cron" {
+resource "kubectl_manifest" "loadgen_cron" {
     yaml_body = <<YAML
 apiVersion: batch/v1beta1
 kind: CronJob
