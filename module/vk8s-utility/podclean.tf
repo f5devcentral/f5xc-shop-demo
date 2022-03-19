@@ -11,7 +11,7 @@ resource "kubernetes_config_map_v1" "app_kubecfg" {
   }
 }
 
-resource "kubernetes_cron_job_v1" "podcleaner" {
+resource "kubernetes_cron_job" "podcleaner" {
   depends_on = [kubernetes_secret_v1.registry-secret]
   metadata {
     name = "podcleaner"
