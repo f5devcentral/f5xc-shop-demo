@@ -11,69 +11,59 @@ resource "kubernetes_config_map_v1" "app_kubecfg" {
   }
 }
 
-resource "kubernetes_cron_job" "podcleaner" {
-  depends_on = [kubernetes_secret_v1.registry-secret]
-  metadata {
-    name = "podcleaner"
-    namespace = var.namespace
-    annotations = {
-      "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
-    }
-  }
-  spec {
-    schedule = "* * * * *"
-    job_template {
-      metadata {}
-      spec {
-        template {
-          metadata {
-            annotations = {
-              "ves.io/virtual-sites" = "${var.namespace}/${var.vsite}"
-              "ves.io/workload-flavor" = "tiny"
-            }
-          }
-          spec {
-            volume {
-              name = "kubecfg"
-              config_map {
-                name = "app-kubecfg"
-                items {
-                  key  = "kubeconfig"
-                  path = "kubeconfig"
-                }
-              }
-            }
-            container {
-              name  = "cleaner"
-              image = "${var.registry_server}/cleaner"
-              env {
-                name  = "NAMESPACE"
-                value = "${var.app_namespace}"
-              }
-              env {
-                name  = "KUBE_PATH"
-                value = "/tmp/kubeconfig"
-              }
-              volume_mount {
-                name       = "kubecfg"
-                read_only  = true
-                mount_path = "/tmp"
-              }
-              termination_message_path   = "/dev/termination-log"
-              termination_message_policy = "File"
-              image_pull_policy          = "Always"
-            }
-            restart_policy                   = "OnFailure"
-            termination_grace_period_seconds = 0
-            dns_policy                       = "ClusterFirst"
-            image_pull_secrets {
-              name = "f5demos-registry-secret"
-            }
-          }
-        }
-      }
-    }
-    failed_jobs_history_limit = 1
-  }
+resource "kubectl_manifest" "podcleaner_cron" {
+    yaml_body = <<YAML
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  annotations:
+    ves.io/virtual-sites: ${var.namespace}/${var.vsite}
+  name: podcleaner
+  namespace: ${var.namespace}
+spec:
+  concurrencyPolicy: Allow
+  schedule: '*/5 * * * *'
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 6
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      template:
+        metadata:
+          annotations:
+            ves.io/virtual-sites: ${var.namespace}/${var.vsite}
+            ves.io/workload-flavor: tiny
+        spec:
+          containers:
+          - env:
+            - name: NAMESPACE
+              value: ${var.app_namespace}
+            - name: KUBE_PATH
+              value: /tmp/kubeconfig
+            image: ${var.registry_server}/cleaner
+            imagePullPolicy: Always
+            name: cleaner
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /tmp
+              mountPropagation: None
+              name: kubecfg
+              readOnly: true
+          dnsPolicy: ClusterFirst
+          imagePullSecrets:
+          - name: f5demos-registry-secret
+          restartPolicy: OnFailure
+          volumes:
+          - configMap:
+              items:
+              - key: kubeconfig
+                path: kubeconfig
+              name: app-kubecfg
+            name: kubecfg
+YAML
 }
-

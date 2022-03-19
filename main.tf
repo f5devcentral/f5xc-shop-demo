@@ -9,7 +9,7 @@ terraform {
       source = "hashicorp/kubernetes"
       version = "2.8.0"
     }
-    //Need this to destroy -- remove later
+    /* Needed for cron issue */
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
@@ -36,6 +36,15 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.f5xc.utility_kubecfg_cluster_ca)
   client_certificate     = base64decode(module.f5xc.utility_kubecfg_client_cert)
   client_key             = base64decode(module.f5xc.utility_kubecfg_client_key)
+}
+
+/* Needed for cron_job issue */
+provider "kubectl" {
+  host                   = module.f5xc.utility_kubecfg_host
+  cluster_ca_certificate = base64decode(module.f5xc.utility_kubecfg_cluster_ca)
+  client_certificate     = base64decode(module.f5xc.utility_kubecfg_client_cert)
+  client_key             = base64decode(module.f5xc.utility_kubecfg_client_key)
+  load_config_file       = false
 }
 
 module "f5xc" {
