@@ -20,7 +20,7 @@ spec:
         spec:
           containers:
             - name: shop-traffic-gen
-              image: ${var.reg_server}/loadgen
+              image: ${var.registry_server}/loadgen
               env:
                 - name: DURATION
                   value: 5m

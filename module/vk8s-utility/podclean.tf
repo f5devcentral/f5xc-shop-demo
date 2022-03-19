@@ -41,7 +41,7 @@ spec:
               value: ${var.app_namespace}
             - name: KUBE_PATH
               value: /tmp/kubeconfig
-            image: ${var.regsitry_server}/cleaner
+            image: ${var.registry_server}/cleaner
             imagePullPolicy: Always
             name: cleaner
             resources: {}
