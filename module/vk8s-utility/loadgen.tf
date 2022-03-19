@@ -4,6 +4,7 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: shop-traffic-gen
+  namespace: ${var.namespace}
   annotations:
     ves.io/virtual-sites: ${var.namespace}/${var.vsite}
 spec:
