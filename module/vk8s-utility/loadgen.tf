@@ -9,8 +9,8 @@ metadata:
     ves.io/virtual-sites: ${var.namespace}/${var.vsite}
 spec:
   schedule: "*/6 * * * *"
-  successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 5
   jobTemplate:
     spec:
       template:

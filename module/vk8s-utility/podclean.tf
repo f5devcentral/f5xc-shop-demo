@@ -22,7 +22,9 @@ metadata:
   namespace: ${var.namespace}
 spec:
   concurrencyPolicy: Allow
+  schedule: '*/5 * * * *'
   failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 6
   jobTemplate:
     spec:
       backoffLimit: 0
@@ -63,7 +65,5 @@ spec:
                 path: kubeconfig
               name: app-kubecfg
             name: kubecfg
-  schedule: '* * * * *'
-  successfulJobsHistoryLimit: 3
 YAML
 }
