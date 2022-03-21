@@ -10,10 +10,10 @@ terraform {
 resource "null_resource" "pip" {
   triggers = {
       #build_number = "${timestamp()}"
-      app_ns        = volterra_namespace.app_ns.id
-      utility_ns    = volterra_namespace.utility_ns.id
-      app_vk8s      = volterra_virtual_k8s.app_vk8s.id
-      utility_vk8s  = volterra_virtual_k8s.utility_vk8s.id
+      #app_ns        = volterra_namespace.app_ns.id
+      #utility_ns    = volterra_namespace.utility_ns.id
+      #app_vk8s      = volterra_virtual_k8s.app_vk8s.id
+      #utility_vk8s  = volterra_virtual_k8s.utility_vk8s.id
   }
   provisioner "local-exec" {
     command = "pip3 install -r ${path.module}/requirements.txt"
