@@ -128,6 +128,7 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
 }
 
 resource "volterra_api_credential" "app_vk8s_cred" {
+  depends_on = [volterra_virtual_k8s.app_vk8s]
   name      = format("%s-app-cred", var.base)
   api_credential_type = "KUBE_CONFIG"
   virtual_k8s_namespace = volterra_namespace.app_ns.name
@@ -136,6 +137,7 @@ resource "volterra_api_credential" "app_vk8s_cred" {
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
+  depends_on = [volterra_virtual_k8s.utility_vk8s]
   name      = format("%s-utl-cred", var.base)
   api_credential_type = "KUBE_CONFIG"
   virtual_k8s_namespace = volterra_namespace.utility_ns.name
