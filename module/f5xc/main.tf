@@ -31,7 +31,7 @@ resource "volterra_namespace" "app_ns" {
       VES_P12     = var.api_p12_file
     }
   }
-  #depends_on = [null_resource.pip]
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_namespace" "utility_ns" {
@@ -45,7 +45,7 @@ resource "volterra_namespace" "utility_ns" {
       VES_P12     = var.api_p12_file
     }
   }
-  #depends_on = [null_resource.pip]
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_site" "spoke" {
@@ -102,7 +102,7 @@ resource "volterra_virtual_k8s" "app_vk8s" {
       VES_P12     = var.api_p12_file
     }
   }
-  #depends_on = [null_resource.pip]
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_k8s" "utility_vk8s" {
@@ -124,7 +124,7 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
       VES_P12     = var.api_p12_file
     }
   }
-  #depends_on = [null_resource.pip]
+  depends_on = [null_resource.pip]
 }
 
 resource "volterra_api_credential" "app_vk8s_cred" {
