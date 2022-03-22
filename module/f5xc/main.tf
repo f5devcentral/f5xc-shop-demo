@@ -20,7 +20,7 @@ resource "volterra_namespace" "app_ns" {
   name = var.base
 
   provisioner "local-exec" {
-    command     = "python --version && ./f5xc_resource_ready.py --type ns --name ${self.name}"
+    command     = "./f5xc_resource_ready.py --type ns --name ${self.name}"
     working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
@@ -33,7 +33,7 @@ resource "volterra_namespace" "utility_ns" {
   name = format("%s-utility", var.base)
 
   provisioner "local-exec" {
-    command     = "python --version && ./f5xc_resource_ready.py --type ns --name ${self.name}"
+    command     = "./f5xc_resource_ready.py --type ns --name ${self.name}"
     working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
