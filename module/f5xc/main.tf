@@ -20,28 +20,26 @@ resource "volterra_namespace" "app_ns" {
   name = var.base
 
   provisioner "local-exec" {
-    command     = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
+    command     = "./f5xc_resource_ready.py --type vk8s --name ${self.name}"
     working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_namespace" "utility_ns" {
   name = format("%s-utility", var.base)
 
   provisioner "local-exec" {
-    command     = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
+    command     = "./f5xc_resource_ready.py --type vk8s --name ${self.name}"
     working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_site" "spoke" {
@@ -98,7 +96,6 @@ resource "volterra_virtual_k8s" "app_vk8s" {
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_k8s" "utility_vk8s" {
@@ -120,11 +117,9 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_api_credential" "app_vk8s_cred" {
-  depends_on = [volterra_virtual_k8s.app_vk8s]
   name      = format("%s-app-cred", var.base)
   api_credential_type = "KUBE_CONFIG"
   virtual_k8s_namespace = volterra_namespace.app_ns.name
@@ -133,7 +128,6 @@ resource "volterra_api_credential" "app_vk8s_cred" {
 }
 
 resource "volterra_api_credential" "utility_vk8s_cred" {
-  depends_on = [volterra_virtual_k8s.utility_vk8s]
   name      = format("%s-utl-cred", var.base)
   api_credential_type = "KUBE_CONFIG"
   virtual_k8s_namespace = volterra_namespace.utility_ns.name
