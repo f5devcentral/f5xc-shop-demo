@@ -568,7 +568,6 @@ class manifest_maker(sdist):
 
     def add_defaults(self):
         sdist.add_defaults(self)
-        self.check_license()
         self.filelist.append(self.template)
         self.filelist.append(self.manifest)
         rcfiles = list(walk_revctrl())
@@ -638,7 +637,7 @@ def warn_depends_obsolete(cmd, basename, filename):
 def _write_requirements(stream, reqs):
     lines = yield_lines(reqs or ())
     append_cr = lambda line: line + '\n'
-    lines = map(append_cr, sorted(lines))
+    lines = map(append_cr, lines)
     stream.writelines(lines)
 
 
