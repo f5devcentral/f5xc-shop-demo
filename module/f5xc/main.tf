@@ -11,7 +11,7 @@ resource "volterra_namespace" "app_ns" {
   name = var.base
 
   provisioner "local-exec" {
-    command     = "python3 --version ./f5xc_resource_ready.py --type ns --name ${self.name}"
+    command     = "./f5xc_resource_ready.py --type ns --name ${self.name}"
     working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
