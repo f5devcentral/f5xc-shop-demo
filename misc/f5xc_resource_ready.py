@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append('packages')
+
 import argparse, os, requests, backoff
 from common import getAuthSession
 
