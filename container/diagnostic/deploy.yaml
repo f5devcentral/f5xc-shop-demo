@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: kubectl
+        app: diagnostic
     spec:
       containers:
         - name: server

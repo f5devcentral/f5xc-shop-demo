@@ -408,7 +408,7 @@ resource "volterra_tcp_loadbalancer" "redis" {
     }
   }
   retract_cluster = true
-  hash_policy_choice_round_robin = true
+  hash_policy_choice_random = true
 }
 
 resource "volterra_tcp_loadbalancer" "adservice" {
@@ -440,5 +440,5 @@ resource "volterra_tcp_loadbalancer" "adservice" {
     }
   }
   retract_cluster = true
-  hash_policy_choice_round_robin = true
+  hash_policy_choice_random = true
 }
