@@ -24,7 +24,8 @@ spec:
   concurrencyPolicy: Allow
   schedule: '*/5 * * * *'
   failedJobsHistoryLimit: 1
-  successfulJobsHistoryLimit: 6
+  successfulJobsHistoryLimit: 3
+  concurrencyPolicy: Replace
   jobTemplate:
     spec:
       backoffLimit: 0
