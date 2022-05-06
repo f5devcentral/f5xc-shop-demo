@@ -7,41 +7,30 @@ terraform {
   }
 }
 
-resource "null_resource" "pip" {
-  triggers = {
-      build_number = "${timestamp()}"
-  }
-  provisioner "local-exec" {
-    command = "pip3 install -r ${path.module}/requirements.txt"
-  }
-}
-
 resource "volterra_namespace" "app_ns" {
   name = var.base
 
   provisioner "local-exec" {
-    command           = "./f5xc_resource_ready.py --type ns --name ${self.name}"
-    working_dir = "${path.module}"
+    command     = "./f5xc_resource_ready.py --type ns --name ${self.name}"
+    working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_namespace" "utility_ns" {
   name = format("%s-utility", var.base)
 
   provisioner "local-exec" {
-    command           = "./f5xc_resource_ready.py --type ns --name ${self.name}"
-    working_dir = "${path.module}"
+    command     = "./f5xc_resource_ready.py --type ns --name ${self.name}"
+    working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_site" "spoke" {
@@ -88,17 +77,16 @@ resource "volterra_virtual_k8s" "app_vk8s" {
     namespace = volterra_namespace.app_ns.name
   }
 
-  //Consistency issue with vk8s resource response
-  //https://github.com/volterraedge/terraform-provider-volterra/issues/54
+  /* Workaround due to: 
+  https://github.com/volterraedge/terraform-provider-volterra/issues/54 */
   provisioner "local-exec" {
-    command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
-    working_dir = "${path.module}"
+    command     = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
+    working_dir = "${path.module}/../../misc"    
     environment = {
       VES_API_URL = var.api_url
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_virtual_k8s" "utility_vk8s" {
@@ -110,17 +98,14 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
     namespace = volterra_namespace.utility_ns.name
   }
 
-  //Consistency issue with vk8s resource response
-  //https://github.com/volterraedge/terraform-provider-volterra/issues/54
   provisioner "local-exec" {
     command = "./f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
-    working_dir = "${path.module}"
+    working_dir = "${path.module}/../../misc"   
     environment = {
       VES_API_URL = var.api_url
       VES_P12     = var.api_p12_file
     }
   }
-  depends_on = [null_resource.pip]
 }
 
 resource "volterra_api_credential" "app_vk8s_cred" {
