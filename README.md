@@ -12,7 +12,8 @@ Once deployed, F5xc Console will be populated with realistic data.
 This allows the demonstration of key F5xc Console concept such as:
 - traffic and application vizualizations
 - HTTP request telemetry
-- security event monitoring
+- event monitoring
+- WAAP and bot protection
 - virtual kubernetes (vk8s) and edge workloads
 
 ## Getting Started
