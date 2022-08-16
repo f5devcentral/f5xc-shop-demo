@@ -1,7 +1,7 @@
 import sys
 sys.path.append('packages')
 
-import requests, cffi
+import requests
 from requests_pkcs12 import Pkcs12Adapter
 
 def getAuthSession(p12_file: str, p12_pass: str) -> dict:
