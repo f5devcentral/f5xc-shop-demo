@@ -2,26 +2,16 @@
 # 2.0, and the BSD License. See the LICENSE file in the root of this repository
 # for complete details.
 
+import typing
 
-def cryptography_has_ec2m():
+
+def cryptography_has_ec2m() -> typing.List[str]:
     return [
         "EC_POINT_get_affine_coordinates_GF2m",
     ]
 
 
-def cryptography_has_rsa_oaep_md():
-    return [
-        "EVP_PKEY_CTX_set_rsa_oaep_md",
-    ]
-
-
-def cryptography_has_rsa_oaep_label():
-    return [
-        "EVP_PKEY_CTX_set0_rsa_oaep_label",
-    ]
-
-
-def cryptography_has_ssl3_method():
+def cryptography_has_ssl3_method() -> typing.List[str]:
     return [
         "SSLv3_method",
         "SSLv3_client_method",
@@ -29,18 +19,18 @@ def cryptography_has_ssl3_method():
     ]
 
 
-def cryptography_has_110_verification_params():
+def cryptography_has_110_verification_params() -> typing.List[str]:
     return ["X509_CHECK_FLAG_NEVER_CHECK_SUBJECT"]
 
 
-def cryptography_has_set_cert_cb():
+def cryptography_has_set_cert_cb() -> typing.List[str]:
     return [
         "SSL_CTX_set_cert_cb",
         "SSL_set_cert_cb",
     ]
 
 
-def cryptography_has_ssl_st():
+def cryptography_has_ssl_st() -> typing.List[str]:
     return [
         "SSL_ST_BEFORE",
         "SSL_ST_OK",
@@ -49,87 +39,87 @@ def cryptography_has_ssl_st():
     ]
 
 
-def cryptography_has_tls_st():
+def cryptography_has_tls_st() -> typing.List[str]:
     return [
         "TLS_ST_BEFORE",
         "TLS_ST_OK",
     ]
 
 
-def cryptography_has_scrypt():
+def cryptography_has_scrypt() -> typing.List[str]:
     return [
         "EVP_PBE_scrypt",
     ]
 
 
-def cryptography_has_evp_pkey_dhx():
+def cryptography_has_evp_pkey_dhx() -> typing.List[str]:
     return [
         "EVP_PKEY_DHX",
     ]
 
 
-def cryptography_has_mem_functions():
+def cryptography_has_mem_functions() -> typing.List[str]:
     return [
         "Cryptography_CRYPTO_set_mem_functions",
     ]
 
 
-def cryptography_has_x509_store_ctx_get_issuer():
+def cryptography_has_x509_store_ctx_get_issuer() -> typing.List[str]:
     return [
         "X509_STORE_get_get_issuer",
         "X509_STORE_set_get_issuer",
     ]
 
 
-def cryptography_has_ed448():
+def cryptography_has_ed448() -> typing.List[str]:
     return [
         "EVP_PKEY_ED448",
         "NID_ED448",
     ]
 
 
-def cryptography_has_ed25519():
+def cryptography_has_ed25519() -> typing.List[str]:
     return [
         "NID_ED25519",
         "EVP_PKEY_ED25519",
     ]
 
 
-def cryptography_has_poly1305():
+def cryptography_has_poly1305() -> typing.List[str]:
     return [
         "NID_poly1305",
         "EVP_PKEY_POLY1305",
     ]
 
 
-def cryptography_has_oneshot_evp_digest_sign_verify():
+def cryptography_has_oneshot_evp_digest_sign_verify() -> typing.List[str]:
     return [
         "EVP_DigestSign",
         "EVP_DigestVerify",
     ]
 
 
-def cryptography_has_evp_digestfinal_xof():
+def cryptography_has_evp_digestfinal_xof() -> typing.List[str]:
     return [
         "EVP_DigestFinalXOF",
     ]
 
 
-def cryptography_has_evp_pkey_get_set_tls_encodedpoint():
+def cryptography_has_evp_pkey_get_set_tls_encodedpoint() -> typing.List[str]:
     return [
         "EVP_PKEY_get1_tls_encodedpoint",
         "EVP_PKEY_set1_tls_encodedpoint",
     ]
 
 
-def cryptography_has_fips():
+def cryptography_has_fips() -> typing.List[str]:
     return [
         "FIPS_mode_set",
         "FIPS_mode",
     ]
 
 
-def cryptography_has_psk():
+def cryptography_has_psk() -> typing.List[str]:
     return [
         "SSL_CTX_use_psk_identity_hint",
         "SSL_CTX_set_psk_server_callback",
@@ -137,7 +127,19 @@ def cryptography_has_psk():
     ]
 
 
-def cryptography_has_custom_ext():
+def cryptography_has_psk_tlsv13() -> typing.List[str]:
+    return [
+        "SSL_CTX_set_psk_find_session_callback",
+        "SSL_CTX_set_psk_use_session_callback",
+        "Cryptography_SSL_SESSION_new",
+        "SSL_CIPHER_find",
+        "SSL_SESSION_set1_master_key",
+        "SSL_SESSION_set_cipher",
+        "SSL_SESSION_set_protocol_version",
+    ]
+
+
+def cryptography_has_custom_ext() -> typing.List[str]:
     return [
         "SSL_CTX_add_client_custom_ext",
         "SSL_CTX_add_server_custom_ext",
@@ -145,20 +147,20 @@ def cryptography_has_custom_ext():
     ]
 
 
-def cryptography_has_openssl_cleanup():
+def cryptography_has_openssl_cleanup() -> typing.List[str]:
     return [
         "OPENSSL_cleanup",
     ]
 
 
-def cryptography_has_tlsv13():
+def cryptography_has_tlsv13() -> typing.List[str]:
     return [
         "TLS1_3_VERSION",
         "SSL_OP_NO_TLSv1_3",
     ]
 
 
-def cryptography_has_tlsv13_functions():
+def cryptography_has_tlsv13_functions() -> typing.List[str]:
     return [
         "SSL_VERIFY_POST_HANDSHAKE",
         "SSL_CTX_set_ciphersuites",
@@ -172,14 +174,14 @@ def cryptography_has_tlsv13_functions():
     ]
 
 
-def cryptography_has_keylog():
+def cryptography_has_keylog() -> typing.List[str]:
     return [
         "SSL_CTX_set_keylog_callback",
         "SSL_CTX_get_keylog_callback",
     ]
 
 
-def cryptography_has_raw_key():
+def cryptography_has_raw_key() -> typing.List[str]:
     return [
         "EVP_PKEY_new_raw_private_key",
         "EVP_PKEY_new_raw_public_key",
@@ -188,7 +190,7 @@ def cryptography_has_raw_key():
     ]
 
 
-def cryptography_has_engine():
+def cryptography_has_engine() -> typing.List[str]:
     return [
         "ENGINE_by_id",
         "ENGINE_init",
@@ -208,13 +210,13 @@ def cryptography_has_engine():
     ]
 
 
-def cryptography_has_verified_chain():
+def cryptography_has_verified_chain() -> typing.List[str]:
     return [
         "SSL_get0_verified_chain",
     ]
 
 
-def cryptography_has_srtp():
+def cryptography_has_srtp() -> typing.List[str]:
     return [
         "SSL_CTX_set_tlsext_use_srtp",
         "SSL_set_tlsext_use_srtp",
@@ -222,7 +224,7 @@ def cryptography_has_srtp():
     ]
 
 
-def cryptography_has_get_proto_version():
+def cryptography_has_get_proto_version() -> typing.List[str]:
     return [
         "SSL_CTX_get_min_proto_version",
         "SSL_CTX_get_max_proto_version",
@@ -231,7 +233,7 @@ def cryptography_has_get_proto_version():
     ]
 
 
-def cryptography_has_providers():
+def cryptography_has_providers() -> typing.List[str]:
     return [
         "OSSL_PROVIDER_load",
         "OSSL_PROVIDER_unload",
@@ -241,26 +243,26 @@ def cryptography_has_providers():
     ]
 
 
-def cryptography_has_op_no_renegotiation():
+def cryptography_has_op_no_renegotiation() -> typing.List[str]:
     return [
         "SSL_OP_NO_RENEGOTIATION",
     ]
 
 
-def cryptography_has_dtls_get_data_mtu():
+def cryptography_has_dtls_get_data_mtu() -> typing.List[str]:
     return [
         "DTLS_get_data_mtu",
     ]
 
 
-def cryptography_has_300_fips():
+def cryptography_has_300_fips() -> typing.List[str]:
     return [
         "EVP_default_properties_is_fips_enabled",
         "EVP_default_properties_enable_fips",
     ]
 
 
-def cryptography_has_ssl_cookie():
+def cryptography_has_ssl_cookie() -> typing.List[str]:
     return [
         "SSL_OP_COOKIE_EXCHANGE",
         "DTLSv1_listen",
@@ -269,7 +271,7 @@ def cryptography_has_ssl_cookie():
     ]
 
 
-def cryptography_has_pkcs7_funcs():
+def cryptography_has_pkcs7_funcs() -> typing.List[str]:
     return [
         "SMIME_write_PKCS7",
         "PEM_write_bio_PKCS7_stream",
@@ -281,7 +283,7 @@ def cryptography_has_pkcs7_funcs():
     ]
 
 
-def cryptography_has_bn_flags():
+def cryptography_has_bn_flags() -> typing.List[str]:
     return [
         "BN_FLG_CONSTTIME",
         "BN_set_flags",
@@ -289,10 +291,18 @@ def cryptography_has_bn_flags():
     ]
 
 
-def cryptography_has_evp_pkey_dh():
+def cryptography_has_evp_pkey_dh() -> typing.List[str]:
     return [
         "EVP_PKEY_set1_DH",
     ]
+
+
+def cryptography_has_300_evp_cipher() -> typing.List[str]:
+    return ["EVP_CIPHER_fetch", "EVP_CIPHER_free"]
+
+
+def cryptography_has_unexpected_eof_while_reading() -> typing.List[str]:
+    return ["SSL_R_UNEXPECTED_EOF_WHILE_READING"]
 
 
 # This is a mapping of
@@ -302,8 +312,6 @@ def cryptography_has_evp_pkey_dh():
 # lists so we can use coverage to measure which are used.
 CONDITIONAL_NAMES = {
     "Cryptography_HAS_EC2M": cryptography_has_ec2m,
-    "Cryptography_HAS_RSA_OAEP_MD": cryptography_has_rsa_oaep_md,
-    "Cryptography_HAS_RSA_OAEP_LABEL": cryptography_has_rsa_oaep_label,
     "Cryptography_HAS_SSL3_METHOD": cryptography_has_ssl3_method,
     "Cryptography_HAS_110_VERIFICATION_PARAMS": (
         cryptography_has_110_verification_params
@@ -328,6 +336,7 @@ CONDITIONAL_NAMES = {
     ),
     "Cryptography_HAS_FIPS": cryptography_has_fips,
     "Cryptography_HAS_PSK": cryptography_has_psk,
+    "Cryptography_HAS_PSK_TLSv1_3": cryptography_has_psk_tlsv13,
     "Cryptography_HAS_CUSTOM_EXT": cryptography_has_custom_ext,
     "Cryptography_HAS_OPENSSL_CLEANUP": cryptography_has_openssl_cleanup,
     "Cryptography_HAS_TLSv1_3": cryptography_has_tlsv13,
@@ -351,4 +360,8 @@ CONDITIONAL_NAMES = {
     "Cryptography_HAS_PKCS7_FUNCS": cryptography_has_pkcs7_funcs,
     "Cryptography_HAS_BN_FLAGS": cryptography_has_bn_flags,
     "Cryptography_HAS_EVP_PKEY_DH": cryptography_has_evp_pkey_dh,
+    "Cryptography_HAS_300_EVP_CIPHER": cryptography_has_300_evp_cipher,
+    "Cryptography_HAS_UNEXPECTED_EOF_WHILE_READING": (
+        cryptography_has_unexpected_eof_while_reading
+    ),
 }

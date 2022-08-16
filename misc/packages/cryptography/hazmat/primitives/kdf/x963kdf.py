@@ -3,7 +3,6 @@
 # for complete details.
 
 
-import struct
 import typing
 
 from cryptography import utils
@@ -15,8 +14,8 @@ from cryptography.hazmat.primitives import constant_time, hashes
 from cryptography.hazmat.primitives.kdf import KeyDerivationFunction
 
 
-def _int_to_u32be(n):
-    return struct.pack(">I", n)
+def _int_to_u32be(n: int) -> bytes:
+    return n.to_bytes(length=4, byteorder="big")
 
 
 class X963KDF(KeyDerivationFunction):

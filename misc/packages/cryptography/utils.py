@@ -21,11 +21,10 @@ class CryptographyDeprecationWarning(UserWarning):
 # Several APIs were deprecated with no specific end-of-life date because of the
 # ubiquity of their use. They should not be removed until we agree on when that
 # cycle ends.
-PersistentlyDeprecated2017 = CryptographyDeprecationWarning
 PersistentlyDeprecated2019 = CryptographyDeprecationWarning
-DeprecatedIn34 = CryptographyDeprecationWarning
 DeprecatedIn35 = CryptographyDeprecationWarning
 DeprecatedIn36 = CryptographyDeprecationWarning
+DeprecatedIn37 = CryptographyDeprecationWarning
 
 
 def _check_bytes(name: str, value: bytes) -> None:
@@ -38,10 +37,6 @@ def _check_byteslike(name: str, value: bytes) -> None:
         memoryview(value)
     except TypeError:
         raise TypeError("{} must be bytes-like".format(name))
-
-
-def read_only_property(name: str):
-    return property(lambda self: getattr(self, name))
 
 
 if typing.TYPE_CHECKING:
@@ -77,7 +72,7 @@ class InterfaceNotImplemented(Exception):
     pass
 
 
-def strip_annotation(signature):
+def strip_annotation(signature: inspect.Signature) -> inspect.Signature:
     return inspect.Signature(
         [
             param.replace(annotation=inspect.Parameter.empty)
@@ -86,7 +81,9 @@ def strip_annotation(signature):
     )
 
 
-def verify_interface(iface, klass, *, check_annotations=False):
+def verify_interface(
+    iface: abc.ABCMeta, klass: object, *, check_annotations: bool = False
+):
     for method in iface.__abstractmethods__:
         if not hasattr(klass, method):
             raise InterfaceNotImplemented(
@@ -108,53 +105,61 @@ def verify_interface(iface, klass, *, check_annotations=False):
             )
 
 
-class _DeprecatedValue(object):
-    def __init__(self, value, message, warning_class):
+class _DeprecatedValue:
+    def __init__(self, value: object, message: str, warning_class):
         self.value = value
         self.message = message
         self.warning_class = warning_class
 
 
 class _ModuleWithDeprecations(types.ModuleType):
-    def __init__(self, module):
+    def __init__(self, module: types.ModuleType):
         super().__init__(module.__name__)
         self.__dict__["_module"] = module
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str) -> object:
         obj = getattr(self._module, attr)
         if isinstance(obj, _DeprecatedValue):
             warnings.warn(obj.message, obj.warning_class, stacklevel=2)
             obj = obj.value
         return obj
 
-    def __setattr__(self, attr, value):
+    def __setattr__(self, attr: str, value: object) -> None:
         setattr(self._module, attr, value)
 
-    def __delattr__(self, attr):
+    def __delattr__(self, attr: str) -> None:
         obj = getattr(self._module, attr)
         if isinstance(obj, _DeprecatedValue):
             warnings.warn(obj.message, obj.warning_class, stacklevel=2)
 
         delattr(self._module, attr)
 
-    def __dir__(self):
+    def __dir__(self) -> typing.Sequence[str]:
         return ["_module"] + dir(self._module)
 
 
-def deprecated(value, module_name, message, warning_class):
+def deprecated(
+    value: object,
+    module_name: str,
+    message: str,
+    warning_class: typing.Type[Warning],
+    name: typing.Optional[str] = None,
+) -> _DeprecatedValue:
     module = sys.modules[module_name]
     if not isinstance(module, _ModuleWithDeprecations):
-        sys.modules[module_name] = _ModuleWithDeprecations(
-            module
-        )  # type: ignore[assignment]
-    return _DeprecatedValue(value, message, warning_class)
+        sys.modules[module_name] = module = _ModuleWithDeprecations(module)
+    dv = _DeprecatedValue(value, message, warning_class)
+    # Maintain backwards compatibility with `name is None` for pyOpenSSL.
+    if name is not None:
+        setattr(module, name, dv)
+    return dv
 
 
-def cached_property(func):
+def cached_property(func: typing.Callable) -> property:
     cached_name = "_cached_{}".format(func)
     sentinel = object()
 
-    def inner(instance):
+    def inner(instance: object):
         cache = getattr(instance, cached_name, sentinel)
         if cache is not sentinel:
             return cache
@@ -165,19 +170,11 @@ def cached_property(func):
     return property(inner)
 
 
-int_from_bytes = deprecated(
-    int.from_bytes,
-    __name__,
-    "int_from_bytes is deprecated, use int.from_bytes instead",
-    DeprecatedIn34,
-)
-
-
 # Python 3.10 changed representation of enums. We use well-defined object
 # representation and string representation from Python 3.9.
 class Enum(enum.Enum):
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.__class__.__name__}.{self._name_}: {self._value_!r}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.__class__.__name__}.{self._name_}"

@@ -6,7 +6,6 @@
 import base64
 import binascii
 import os
-import struct
 import time
 import typing
 
@@ -24,13 +23,18 @@ class InvalidToken(Exception):
 _MAX_CLOCK_SKEW = 60
 
 
-class Fernet(object):
+class Fernet:
     def __init__(
         self,
         key: typing.Union[bytes, str],
         backend: typing.Any = None,
     ):
-        key = base64.urlsafe_b64decode(key)
+        try:
+            key = base64.urlsafe_b64decode(key)
+        except binascii.Error as exc:
+            raise ValueError(
+                "Fernet key must be 32 url-safe base64-encoded bytes."
+            ) from exc
         if len(key) != 32:
             raise ValueError(
                 "Fernet key must be 32 url-safe base64-encoded bytes."
@@ -64,7 +68,10 @@ class Fernet(object):
         ciphertext = encryptor.update(padded_data) + encryptor.finalize()
 
         basic_parts = (
-            b"\x80" + struct.pack(">Q", current_time) + iv + ciphertext
+            b"\x80"
+            + current_time.to_bytes(length=8, byteorder="big")
+            + iv
+            + ciphertext
         )
 
         h = HMAC(self._signing_key, hashes.SHA256())
@@ -107,10 +114,10 @@ class Fernet(object):
         if not data or data[0] != 0x80:
             raise InvalidToken
 
-        try:
-            (timestamp,) = struct.unpack(">Q", data[1:9])
-        except struct.error:
+        if len(data) < 9:
             raise InvalidToken
+
+        timestamp = int.from_bytes(data[1:9], byteorder="big")
         return timestamp, data
 
     def _verify_signature(self, data: bytes) -> None:
@@ -157,7 +164,7 @@ class Fernet(object):
         return unpadded
 
 
-class MultiFernet(object):
+class MultiFernet:
     def __init__(self, fernets: typing.Iterable[Fernet]):
         fernets = list(fernets)
         if not fernets:

@@ -22,6 +22,8 @@ _ALLOWED_PKCS12_TYPES = typing.Union[
     rsa.RSAPrivateKey,
     dsa.DSAPrivateKey,
     ec.EllipticCurvePrivateKey,
+    ed25519.Ed25519PrivateKey,
+    ed448.Ed448PrivateKey,
 ]
 
 
@@ -46,7 +48,7 @@ class PKCS12Certificate:
     def certificate(self) -> x509.Certificate:
         return self._cert
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PKCS12Certificate):
             return NotImplemented
 
@@ -54,9 +56,6 @@ class PKCS12Certificate:
             self.certificate == other.certificate
             and self.friendly_name == other.friendly_name
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.certificate, self.friendly_name))
@@ -114,7 +113,7 @@ class PKCS12KeyAndCertificates:
     def additional_certs(self) -> typing.List[PKCS12Certificate]:
         return self._additional_certs
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PKCS12KeyAndCertificates):
             return NotImplemented
 
@@ -123,9 +122,6 @@ class PKCS12KeyAndCertificates:
             and self.cert == other.cert
             and self.additional_certs == other.additional_certs
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.key, self.cert, tuple(self.additional_certs)))
@@ -142,7 +138,7 @@ def load_key_and_certificates(
     password: typing.Optional[bytes],
     backend: typing.Any = None,
 ) -> typing.Tuple[
-    typing.Optional[_ALLOWED_PKCS12_TYPES],
+    typing.Optional[PRIVATE_KEY_TYPES],
     typing.Optional[x509.Certificate],
     typing.List[x509.Certificate],
 ]:
@@ -161,11 +157,17 @@ def load_pkcs12(
     return ossl.load_pkcs12(data, password)
 
 
+_PKCS12_CAS_TYPES = typing.Union[
+    x509.Certificate,
+    PKCS12Certificate,
+]
+
+
 def serialize_key_and_certificates(
     name: typing.Optional[bytes],
     key: typing.Optional[_ALLOWED_PKCS12_TYPES],
     cert: typing.Optional[x509.Certificate],
-    cas: typing.Optional[typing.Iterable[x509.Certificate]],
+    cas: typing.Optional[typing.Iterable[_PKCS12_CAS_TYPES]],
     encryption_algorithm: serialization.KeySerializationEncryption,
 ) -> bytes:
     if key is not None and not isinstance(
@@ -174,17 +176,29 @@ def serialize_key_and_certificates(
             rsa.RSAPrivateKey,
             dsa.DSAPrivateKey,
             ec.EllipticCurvePrivateKey,
+            ed25519.Ed25519PrivateKey,
+            ed448.Ed448PrivateKey,
         ),
     ):
         raise TypeError(
-            "Key must be RSA, DSA, or EllipticCurve private key or None."
+            "Key must be RSA, DSA, EllipticCurve, ED25519, or ED448"
+            " private key, or None."
         )
     if cert is not None and not isinstance(cert, x509.Certificate):
         raise TypeError("cert must be a certificate or None")
 
     if cas is not None:
         cas = list(cas)
-        if not all(isinstance(val, x509.Certificate) for val in cas):
+        if not all(
+            isinstance(
+                val,
+                (
+                    x509.Certificate,
+                    PKCS12Certificate,
+                ),
+            )
+            for val in cas
+        ):
             raise TypeError("all values in cas must be certificates")
 
     if not isinstance(

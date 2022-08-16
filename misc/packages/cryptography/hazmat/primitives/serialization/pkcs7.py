@@ -23,6 +23,15 @@ def load_der_pkcs7_certificates(data: bytes) -> typing.List[x509.Certificate]:
     return backend.load_der_pkcs7_certificates(data)
 
 
+def serialize_certificates(
+    certs: typing.List[x509.Certificate],
+    encoding: serialization.Encoding,
+) -> bytes:
+    from cryptography.hazmat.backends.openssl.backend import backend
+
+    return backend.pkcs7_serialize_certificates(certs, encoding)
+
+
 _ALLOWED_PKCS7_HASH_TYPES = typing.Union[
     hashes.SHA1,
     hashes.SHA224,
@@ -45,8 +54,19 @@ class PKCS7Options(utils.Enum):
     NoCerts = "Don't embed signer certificate"
 
 
-class PKCS7SignatureBuilder(object):
-    def __init__(self, data=None, signers=[], additional_certs=[]):
+class PKCS7SignatureBuilder:
+    def __init__(
+        self,
+        data: typing.Optional[bytes] = None,
+        signers: typing.List[
+            typing.Tuple[
+                x509.Certificate,
+                _ALLOWED_PRIVATE_KEY_TYPES,
+                _ALLOWED_PKCS7_HASH_TYPES,
+            ]
+        ] = [],
+        additional_certs: typing.List[x509.Certificate] = [],
+    ):
         self._data = data
         self._signers = signers
         self._additional_certs = additional_certs
