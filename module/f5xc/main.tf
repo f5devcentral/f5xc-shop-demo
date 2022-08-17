@@ -318,35 +318,38 @@ resource "volterra_http_loadbalancer" "frontend" {
     name      = volterra_app_firewall.af.name
     namespace = volterra_namespace.app_ns.name
   }
-  bot_defense {
-    policy {
-      disable_js_insert       = false
-      js_insert_all_pages {
-        javascript_location  = "After <head> tag"
-      }
-      protected_app_endpoints {
-        any_domain = true
-        path {
-          prefix = "/cart"
+  dynamic "bot_defense" {
+    for_each = var.enable_bot_defense ? [1] : [] //True
+    content {
+      policy {
+        disable_js_insert       = false
+        js_insert_all_pages {
+          javascript_location  = "After <head> tag"
         }
-        protocol = "https"
-        web  = true
-        http_methods = ["POST"]
-        metadata {
-          name = format("%s-bot-defense", var.base)
-        }
-        mitigation {
-          block {
-            body = "string:///PHA+VGhpcyBpcyBhIGJvdCBkZWZlbnNlIGJsb2NrIHBhZ2UuPC9wPg==" 
-            #<p>This is a bot defense block page.</p>"
-            status = "BadRequest"
+        protected_app_endpoints {
+          any_domain = true
+          path {
+            prefix = "/cart"
+          }
+          protocol = "https"
+          web  = true
+          http_methods = ["POST"]
+          metadata {
+            name = format("%s-bot-defense", var.base)
+          }
+          mitigation {
+            block {
+              body = "string:///PHA+VGhpcyBpcyBhIGJvdCBkZWZlbnNlIGJsb2NrIHBhZ2UuPC9wPg==" 
+              #<p>This is a bot defense block page.</p>"
+              status = "BadRequest"
+            }
           }
         }
       }
+      timeout = 1000
+      regional_endpoint = var.bot_defense_region
     }
-    timeout = 1000
-    regional_endpoint = var.bot_defense_region
-  }
+  } 
   user_identification {
     name      = volterra_user_identification.ui.name
     namespace = volterra_namespace.app_ns.name

@@ -58,6 +58,7 @@ module "f5xc" {
   hub_site_selector       = var.hub_site_selector
   utility_site_selector   = var.utility_site_selector
   cred_expiry_days        = var.cred_expiry_days
+  enable_bot_defense      = var.enable_bot_defense
   bot_defense_region      = var.bot_defense_region
 }
 

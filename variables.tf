@@ -39,6 +39,11 @@ variable "registry_config_json" {
   description = "registry config data string in type kubernetes.io/dockerconfigjson"
 }
 
+variable "enable_bot_defense" {
+  type    = bool
+  default = True
+}
+
 variable "bot_defense_region" {
   default = "US"
 }
