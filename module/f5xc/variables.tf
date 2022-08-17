@@ -22,5 +22,8 @@ variable "utility_site_selector" {
 variable "cred_expiry_days" {    
 }
 
+variable "enable_bot_defense" {
+}
+
 variable "bot_defense_region" {
 }
