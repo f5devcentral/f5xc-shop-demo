@@ -40,7 +40,7 @@ variable "registry_config_json" {
 }
 
 variable "enable_bot_defense" {
-  default = True
+  default = true
 }
 
 variable "bot_defense_region" {
