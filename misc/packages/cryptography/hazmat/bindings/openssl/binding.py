@@ -3,10 +3,10 @@
 # for complete details.
 
 
-import collections
 import threading
 import types
 import typing
+import warnings
 
 import cryptography
 from cryptography import utils
@@ -14,46 +14,57 @@ from cryptography.exceptions import InternalError
 from cryptography.hazmat.bindings._openssl import ffi, lib
 from cryptography.hazmat.bindings.openssl._conditional import CONDITIONAL_NAMES
 
-_OpenSSLErrorWithText = collections.namedtuple(
-    "_OpenSSLErrorWithText", ["code", "lib", "reason", "reason_text"]
+_OpenSSLErrorWithText = typing.NamedTuple(
+    "_OpenSSLErrorWithText",
+    [("code", int), ("lib", int), ("reason", int), ("reason_text", bytes)],
 )
 
 
-class _OpenSSLError(object):
-    def __init__(self, code, lib, reason):
+class _OpenSSLError:
+    def __init__(self, code: int, lib: int, reason: int):
         self._code = code
         self._lib = lib
         self._reason = reason
 
-    def _lib_reason_match(self, lib, reason):
+    def _lib_reason_match(self, lib: int, reason: int) -> bool:
         return lib == self.lib and reason == self.reason
 
-    code = utils.read_only_property("_code")
-    lib = utils.read_only_property("_lib")
-    reason = utils.read_only_property("_reason")
+    @property
+    def code(self) -> int:
+        return self._code
+
+    @property
+    def lib(self) -> int:
+        return self._lib
+
+    @property
+    def reason(self) -> int:
+        return self._reason
 
 
-def _consume_errors(lib):
+def _consume_errors(lib) -> typing.List[_OpenSSLError]:
     errors = []
     while True:
-        code = lib.ERR_get_error()
+        code: int = lib.ERR_get_error()
         if code == 0:
             break
 
-        err_lib = lib.ERR_GET_LIB(code)
-        err_reason = lib.ERR_GET_REASON(code)
+        err_lib: int = lib.ERR_GET_LIB(code)
+        err_reason: int = lib.ERR_GET_REASON(code)
 
         errors.append(_OpenSSLError(code, err_lib, err_reason))
 
     return errors
 
 
-def _errors_with_text(errors):
+def _errors_with_text(
+    errors: typing.List[_OpenSSLError],
+) -> typing.List[_OpenSSLErrorWithText]:
     errors_with_text = []
     for err in errors:
         buf = ffi.new("char[]", 256)
         lib.ERR_error_string_n(err.code, buf, len(buf))
-        err_text_reason = ffi.string(buf)
+        err_text_reason: bytes = ffi.string(buf)
 
         errors_with_text.append(
             _OpenSSLErrorWithText(
@@ -68,7 +79,9 @@ def _consume_errors_with_text(lib):
     return _errors_with_text(_consume_errors(lib))
 
 
-def _openssl_assert(lib, ok, errors=None):
+def _openssl_assert(
+    lib, ok: bool, errors: typing.Optional[typing.List[_OpenSSLError]] = None
+) -> None:
     if not ok:
         if errors is None:
             errors = _consume_errors(lib)
@@ -101,7 +114,7 @@ def build_conditional_library(lib, conditional_names):
     return conditional_lib
 
 
-class Binding(object):
+class Binding:
     """
     OpenSSL API wrapper.
     """
@@ -116,7 +129,7 @@ class Binding(object):
     def __init__(self):
         self._ensure_ffi_initialized()
 
-    def _enable_fips(self):
+    def _enable_fips(self) -> None:
         # This function enables FIPS mode for OpenSSL 3.0.0 on installs that
         # have the FIPS provider installed properly.
         _openssl_assert(self.lib, self.lib.CRYPTOGRAPHY_OPENSSL_300_OR_GREATER)
@@ -150,10 +163,6 @@ class Binding(object):
             if not cls._lib_loaded:
                 cls.lib = build_conditional_library(lib, CONDITIONAL_NAMES)
                 cls._lib_loaded = True
-                # initialize the SSL library
-                cls.lib.SSL_library_init()
-                # adds all ciphers/digests for EVP
-                cls.lib.OpenSSL_add_all_algorithms()
                 cls._register_osrandom_engine()
                 # As of OpenSSL 3.0.0 we must register a legacy cipher provider
                 # to get RC2 (needed for junk asymmetric private key
@@ -177,6 +186,20 @@ class Binding(object):
     @classmethod
     def init_static_locks(cls):
         cls._ensure_ffi_initialized()
+
+
+def _verify_openssl_version(lib):
+    if (
+        lib.CRYPTOGRAPHY_OPENSSL_LESS_THAN_111
+        and not lib.CRYPTOGRAPHY_IS_LIBRESSL
+        and not lib.CRYPTOGRAPHY_IS_BORINGSSL
+    ):
+        warnings.warn(
+            "OpenSSL version 1.1.0 is no longer supported by the OpenSSL "
+            "project, please upgrade. The next release of cryptography will "
+            "be the last to support compiling with OpenSSL 1.1.0.",
+            utils.DeprecatedIn37,
+        )
 
 
 def _verify_package_version(version):
@@ -203,3 +226,5 @@ def _verify_package_version(version):
 _verify_package_version(cryptography.__version__)
 
 Binding.init_static_locks()
+
+_verify_openssl_version(Binding.lib)

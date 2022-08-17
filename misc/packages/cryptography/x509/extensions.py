@@ -16,8 +16,8 @@ from cryptography.hazmat.primitives import constant_time, serialization
 from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurvePublicKey
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from cryptography.hazmat.primitives.asymmetric.types import (
+    CERTIFICATE_ISSUER_PUBLIC_KEY_TYPES,
     CERTIFICATE_PUBLIC_KEY_TYPES,
-    PUBLIC_KEY_TYPES,
 )
 from cryptography.x509.certificate_transparency import (
     SignedCertificateTimestamp,
@@ -41,7 +41,9 @@ from cryptography.x509.oid import (
     ObjectIdentifier,
 )
 
-ExtensionTypeVar = typing.TypeVar("ExtensionTypeVar", bound="ExtensionType")
+ExtensionTypeVar = typing.TypeVar(
+    "ExtensionTypeVar", bound="ExtensionType", covariant=True
+)
 
 
 def _key_identifier_from_public_key(
@@ -107,7 +109,7 @@ class ExtensionType(metaclass=abc.ABCMeta):
         )
 
 
-class Extensions(object):
+class Extensions:
     def __init__(
         self, extensions: typing.Iterable["Extension[ExtensionType]"]
     ) -> None:
@@ -155,14 +157,11 @@ class CRLNumber(ExtensionType):
 
         self._crl_number = crl_number
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, CRLNumber):
             return NotImplemented
 
         return self.crl_number == other.crl_number
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self.crl_number)
@@ -214,14 +213,14 @@ class AuthorityKeyIdentifier(ExtensionType):
         self._authority_cert_issuer = authority_cert_issuer
         self._authority_cert_serial_number = authority_cert_serial_number
 
-    # This takes PUBLIC_KEY_TYPES and not CERTIFICATE_PUBLIC_KEY_TYPES
-    # because an issuer cannot have an X25519/X448 key. This introduces
-    # some unfortunate asymmetry that requires typing users to explicitly
+    # This takes a subset of CERTIFICATE_PUBLIC_KEY_TYPES because an issuer
+    # cannot have an X25519/X448 key. This introduces some unfortunate
+    # asymmetry that requires typing users to explicitly
     # narrow their type, but we should make this accurate and not just
     # convenient.
     @classmethod
     def from_issuer_public_key(
-        cls, public_key: PUBLIC_KEY_TYPES
+        cls, public_key: CERTIFICATE_ISSUER_PUBLIC_KEY_TYPES
     ) -> "AuthorityKeyIdentifier":
         digest = _key_identifier_from_public_key(public_key)
         return cls(
@@ -248,7 +247,7 @@ class AuthorityKeyIdentifier(ExtensionType):
             ")>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, AuthorityKeyIdentifier):
             return NotImplemented
 
@@ -258,9 +257,6 @@ class AuthorityKeyIdentifier(ExtensionType):
             and self.authority_cert_serial_number
             == other.authority_cert_serial_number
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         if self.authority_cert_issuer is None:
@@ -312,14 +308,11 @@ class SubjectKeyIdentifier(ExtensionType):
     def __repr__(self) -> str:
         return "<SubjectKeyIdentifier(digest={0!r})>".format(self.digest)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, SubjectKeyIdentifier):
             return NotImplemented
 
         return constant_time.bytes_eq(self.digest, other.digest)
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self.digest)
@@ -348,14 +341,11 @@ class AuthorityInformationAccess(ExtensionType):
     def __repr__(self) -> str:
         return "<AuthorityInformationAccess({})>".format(self._descriptions)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, AuthorityInformationAccess):
             return NotImplemented
 
         return self._descriptions == other._descriptions
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._descriptions))
@@ -384,14 +374,11 @@ class SubjectInformationAccess(ExtensionType):
     def __repr__(self) -> str:
         return "<SubjectInformationAccess({})>".format(self._descriptions)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, SubjectInformationAccess):
             return NotImplemented
 
         return self._descriptions == other._descriptions
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._descriptions))
@@ -400,7 +387,7 @@ class SubjectInformationAccess(ExtensionType):
         return rust_x509.encode_extension_value(self)
 
 
-class AccessDescription(object):
+class AccessDescription:
     def __init__(
         self, access_method: ObjectIdentifier, access_location: GeneralName
     ) -> None:
@@ -419,7 +406,7 @@ class AccessDescription(object):
             "on={0.access_location})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, AccessDescription):
             return NotImplemented
 
@@ -427,9 +414,6 @@ class AccessDescription(object):
             self.access_method == other.access_method
             and self.access_location == other.access_location
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.access_method, self.access_location))
@@ -476,14 +460,11 @@ class BasicConstraints(ExtensionType):
             "<BasicConstraints(ca={0.ca}, " "path_length={0.path_length})>"
         ).format(self)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, BasicConstraints):
             return NotImplemented
 
         return self.ca == other.ca and self.path_length == other.path_length
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.ca, self.path_length))
@@ -505,14 +486,11 @@ class DeltaCRLIndicator(ExtensionType):
     def crl_number(self) -> int:
         return self._crl_number
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, DeltaCRLIndicator):
             return NotImplemented
 
         return self.crl_number == other.crl_number
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self.crl_number)
@@ -548,14 +526,11 @@ class CRLDistributionPoints(ExtensionType):
     def __repr__(self) -> str:
         return "<CRLDistributionPoints({})>".format(self._distribution_points)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, CRLDistributionPoints):
             return NotImplemented
 
         return self._distribution_points == other._distribution_points
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._distribution_points))
@@ -588,14 +563,11 @@ class FreshestCRL(ExtensionType):
     def __repr__(self) -> str:
         return "<FreshestCRL({})>".format(self._distribution_points)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, FreshestCRL):
             return NotImplemented
 
         return self._distribution_points == other._distribution_points
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._distribution_points))
@@ -604,7 +576,7 @@ class FreshestCRL(ExtensionType):
         return rust_x509.encode_extension_value(self)
 
 
-class DistributionPoint(object):
+class DistributionPoint:
     def __init__(
         self,
         full_name: typing.Optional[typing.Iterable[GeneralName]],
@@ -671,7 +643,7 @@ class DistributionPoint(object):
             "crl_issuer={0.crl_issuer})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, DistributionPoint):
             return NotImplemented
 
@@ -681,9 +653,6 @@ class DistributionPoint(object):
             and self.reasons == other.reasons
             and self.crl_issuer == other.crl_issuer
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         if self.full_name is not None:
@@ -795,7 +764,7 @@ class PolicyConstraints(ExtensionType):
             "mapping})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PolicyConstraints):
             return NotImplemented
 
@@ -803,9 +772,6 @@ class PolicyConstraints(ExtensionType):
             self.require_explicit_policy == other.require_explicit_policy
             and self.inhibit_policy_mapping == other.inhibit_policy_mapping
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(
@@ -842,14 +808,11 @@ class CertificatePolicies(ExtensionType):
     def __repr__(self) -> str:
         return "<CertificatePolicies({})>".format(self._policies)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, CertificatePolicies):
             return NotImplemented
 
         return self._policies == other._policies
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._policies))
@@ -858,7 +821,7 @@ class CertificatePolicies(ExtensionType):
         return rust_x509.encode_extension_value(self)
 
 
-class PolicyInformation(object):
+class PolicyInformation:
     def __init__(
         self,
         policy_identifier: ObjectIdentifier,
@@ -889,7 +852,7 @@ class PolicyInformation(object):
             "y_qualifiers={0.policy_qualifiers})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PolicyInformation):
             return NotImplemented
 
@@ -897,9 +860,6 @@ class PolicyInformation(object):
             self.policy_identifier == other.policy_identifier
             and self.policy_qualifiers == other.policy_qualifiers
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         if self.policy_qualifiers is not None:
@@ -922,7 +882,7 @@ class PolicyInformation(object):
         return self._policy_qualifiers
 
 
-class UserNotice(object):
+class UserNotice:
     def __init__(
         self,
         notice_reference: typing.Optional["NoticeReference"],
@@ -944,7 +904,7 @@ class UserNotice(object):
             "{0.explicit_text!r})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, UserNotice):
             return NotImplemented
 
@@ -952,9 +912,6 @@ class UserNotice(object):
             self.notice_reference == other.notice_reference
             and self.explicit_text == other.explicit_text
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.notice_reference, self.explicit_text))
@@ -968,7 +925,7 @@ class UserNotice(object):
         return self._explicit_text
 
 
-class NoticeReference(object):
+class NoticeReference:
     def __init__(
         self,
         organization: typing.Optional[str],
@@ -987,7 +944,7 @@ class NoticeReference(object):
             "{0.notice_numbers})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, NoticeReference):
             return NotImplemented
 
@@ -995,9 +952,6 @@ class NoticeReference(object):
             self.organization == other.organization
             and self.notice_numbers == other.notice_numbers
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.organization, tuple(self.notice_numbers)))
@@ -1028,14 +982,11 @@ class ExtendedKeyUsage(ExtensionType):
     def __repr__(self) -> str:
         return "<ExtendedKeyUsage({})>".format(self._usages)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, ExtendedKeyUsage):
             return NotImplemented
 
         return self._usages == other._usages
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._usages))
@@ -1047,14 +998,11 @@ class ExtendedKeyUsage(ExtensionType):
 class OCSPNoCheck(ExtensionType):
     oid = ExtensionOID.OCSP_NO_CHECK
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, OCSPNoCheck):
             return NotImplemented
 
         return True
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(OCSPNoCheck)
@@ -1069,14 +1017,11 @@ class OCSPNoCheck(ExtensionType):
 class PrecertPoison(ExtensionType):
     oid = ExtensionOID.PRECERT_POISON
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PrecertPoison):
             return NotImplemented
 
         return True
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(PrecertPoison)
@@ -1109,14 +1054,11 @@ class TLSFeature(ExtensionType):
     def __repr__(self) -> str:
         return "<TLSFeature(features={0._features})>".format(self)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, TLSFeature):
             return NotImplemented
 
         return self._features == other._features
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._features))
@@ -1154,14 +1096,11 @@ class InhibitAnyPolicy(ExtensionType):
     def __repr__(self) -> str:
         return "<InhibitAnyPolicy(skip_certs={0.skip_certs})>".format(self)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, InhibitAnyPolicy):
             return NotImplemented
 
         return self.skip_certs == other.skip_certs
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self.skip_certs)
@@ -1272,7 +1211,7 @@ class KeyUsage(ExtensionType):
             "encipher_only={1}, decipher_only={2})>"
         ).format(self, encipher_only, decipher_only)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, KeyUsage):
             return NotImplemented
 
@@ -1287,9 +1226,6 @@ class KeyUsage(ExtensionType):
             and self._encipher_only == other._encipher_only
             and self._decipher_only == other._decipher_only
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(
@@ -1320,6 +1256,10 @@ class NameConstraints(ExtensionType):
     ) -> None:
         if permitted_subtrees is not None:
             permitted_subtrees = list(permitted_subtrees)
+            if not permitted_subtrees:
+                raise ValueError(
+                    "permitted_subtrees must be a non-empty list or None"
+                )
             if not all(isinstance(x, GeneralName) for x in permitted_subtrees):
                 raise TypeError(
                     "permitted_subtrees must be a list of GeneralName objects "
@@ -1330,6 +1270,10 @@ class NameConstraints(ExtensionType):
 
         if excluded_subtrees is not None:
             excluded_subtrees = list(excluded_subtrees)
+            if not excluded_subtrees:
+                raise ValueError(
+                    "excluded_subtrees must be a non-empty list or None"
+                )
             if not all(isinstance(x, GeneralName) for x in excluded_subtrees):
                 raise TypeError(
                     "excluded_subtrees must be a list of GeneralName objects "
@@ -1347,7 +1291,7 @@ class NameConstraints(ExtensionType):
         self._permitted_subtrees = permitted_subtrees
         self._excluded_subtrees = excluded_subtrees
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, NameConstraints):
             return NotImplemented
 
@@ -1355,9 +1299,6 @@ class NameConstraints(ExtensionType):
             self.excluded_subtrees == other.excluded_subtrees
             and self.permitted_subtrees == other.permitted_subtrees
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def _validate_ip_name(self, tree: typing.Iterable[GeneralName]) -> None:
         if any(
@@ -1445,7 +1386,7 @@ class Extension(typing.Generic[ExtensionTypeVar]):
             "value={0.value})>"
         ).format(self)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Extension):
             return NotImplemented
 
@@ -1455,14 +1396,11 @@ class Extension(typing.Generic[ExtensionTypeVar]):
             and self.value == other.value
         )
 
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
-
     def __hash__(self) -> int:
         return hash((self.oid, self.critical, self.value))
 
 
-class GeneralNames(object):
+class GeneralNames:
     def __init__(self, general_names: typing.Iterable[GeneralName]) -> None:
         general_names = list(general_names)
         if not all(isinstance(x, GeneralName) for x in general_names):
@@ -1541,14 +1479,11 @@ class GeneralNames(object):
     def __repr__(self) -> str:
         return "<GeneralNames({})>".format(self._general_names)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, GeneralNames):
             return NotImplemented
 
         return self._general_names == other._general_names
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(tuple(self._general_names))
@@ -1622,14 +1557,11 @@ class SubjectAlternativeName(ExtensionType):
     def __repr__(self) -> str:
         return "<SubjectAlternativeName({})>".format(self._general_names)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, SubjectAlternativeName):
             return NotImplemented
 
         return self._general_names == other._general_names
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self._general_names)
@@ -1706,14 +1638,11 @@ class IssuerAlternativeName(ExtensionType):
     def __repr__(self) -> str:
         return "<IssuerAlternativeName({})>".format(self._general_names)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, IssuerAlternativeName):
             return NotImplemented
 
         return self._general_names == other._general_names
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self._general_names)
@@ -1790,14 +1719,11 @@ class CertificateIssuer(ExtensionType):
     def __repr__(self) -> str:
         return "<CertificateIssuer({})>".format(self._general_names)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, CertificateIssuer):
             return NotImplemented
 
         return self._general_names == other._general_names
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self._general_names)
@@ -1818,14 +1744,11 @@ class CRLReason(ExtensionType):
     def __repr__(self) -> str:
         return "<CRLReason(reason={})>".format(self._reason)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, CRLReason):
             return NotImplemented
 
         return self.reason == other.reason
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self.reason)
@@ -1852,14 +1775,11 @@ class InvalidityDate(ExtensionType):
             self._invalidity_date
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, InvalidityDate):
             return NotImplemented
 
         return self.invalidity_date == other.invalidity_date
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self.invalidity_date)
@@ -1904,7 +1824,7 @@ class PrecertificateSignedCertificateTimestamps(ExtensionType):
     def __hash__(self) -> int:
         return hash(tuple(self._signed_certificate_timestamps))
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PrecertificateSignedCertificateTimestamps):
             return NotImplemented
 
@@ -1912,9 +1832,6 @@ class PrecertificateSignedCertificateTimestamps(ExtensionType):
             self._signed_certificate_timestamps
             == other._signed_certificate_timestamps
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def public_bytes(self) -> bytes:
         return rust_x509.encode_extension_value(self)
@@ -1950,7 +1867,7 @@ class SignedCertificateTimestamps(ExtensionType):
     def __hash__(self) -> int:
         return hash(tuple(self._signed_certificate_timestamps))
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, SignedCertificateTimestamps):
             return NotImplemented
 
@@ -1958,9 +1875,6 @@ class SignedCertificateTimestamps(ExtensionType):
             self._signed_certificate_timestamps
             == other._signed_certificate_timestamps
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def public_bytes(self) -> bytes:
         return rust_x509.encode_extension_value(self)
@@ -1975,14 +1889,11 @@ class OCSPNonce(ExtensionType):
 
         self._nonce = nonce
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, OCSPNonce):
             return NotImplemented
 
         return self.nonce == other.nonce
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(self.nonce)
@@ -2096,7 +2007,7 @@ class IssuingDistributionPoint(ExtensionType):
             "{0.only_contains_attribute_certs})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, IssuingDistributionPoint):
             return NotImplemented
 
@@ -2110,9 +2021,6 @@ class IssuingDistributionPoint(ExtensionType):
             and self.only_contains_attribute_certs
             == other.only_contains_attribute_certs
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash(
@@ -2182,14 +2090,11 @@ class UnrecognizedExtension(ExtensionType):
             "value={0.value!r})>".format(self)
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, UnrecognizedExtension):
             return NotImplemented
 
         return self.oid == other.oid and self.value == other.value
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.oid, self.value))

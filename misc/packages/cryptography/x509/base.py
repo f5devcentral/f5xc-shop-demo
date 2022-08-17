@@ -21,9 +21,9 @@ from cryptography.hazmat.primitives.asymmetric import (
     x448,
 )
 from cryptography.hazmat.primitives.asymmetric.types import (
+    CERTIFICATE_ISSUER_PUBLIC_KEY_TYPES,
+    CERTIFICATE_PRIVATE_KEY_TYPES,
     CERTIFICATE_PUBLIC_KEY_TYPES,
-    PRIVATE_KEY_TYPES as PRIVATE_KEY_TYPES,
-    PUBLIC_KEY_TYPES as PUBLIC_KEY_TYPES,
 )
 from cryptography.x509.extensions import (
     Extension,
@@ -56,10 +56,12 @@ def _reject_duplicate_extension(
 
 def _reject_duplicate_attribute(
     oid: ObjectIdentifier,
-    attributes: typing.List[typing.Tuple[ObjectIdentifier, bytes]],
+    attributes: typing.List[
+        typing.Tuple[ObjectIdentifier, bytes, typing.Optional[int]]
+    ],
 ) -> None:
     # This is quadratic in the number of attributes
-    for attr_oid, _ in attributes:
+    for attr_oid, _, _ in attributes:
         if attr_oid == oid:
             raise ValueError("This attribute has already been set.")
 
@@ -97,10 +99,10 @@ class Attribute:
     def value(self) -> bytes:
         return self._value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Attribute(oid={}, value={!r})>".format(self.oid, self.value)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Attribute):
             return NotImplemented
 
@@ -109,9 +111,6 @@ class Attribute:
             and self.value == other.value
             and self._type == other._type
         )
-
-    def __ne__(self, other: typing.Any) -> bool:
-        return not self == other
 
     def __hash__(self) -> int:
         return hash((self.oid, self.value, self._type))
@@ -126,7 +125,7 @@ class Attributes:
 
     __len__, __iter__, __getitem__ = _make_sequence_methods("_attributes")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Attributes({})>".format(self._attributes)
 
     def get_attribute_for_oid(self, oid: ObjectIdentifier) -> Attribute:
@@ -234,12 +233,6 @@ class Certificate(metaclass=abc.ABCMeta):
     def __eq__(self, other: object) -> bool:
         """
         Checks equality.
-        """
-
-    @abc.abstractmethod
-    def __ne__(self, other: object) -> bool:
-        """
-        Checks not equal.
         """
 
     @abc.abstractmethod
@@ -387,12 +380,6 @@ class CertificateRevocationList(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def __ne__(self, other: object) -> bool:
-        """
-        Checks not equal.
-        """
-
-    @abc.abstractmethod
     def __len__(self) -> int:
         """
         Number of revoked certificates in the CRL.
@@ -421,7 +408,9 @@ class CertificateRevocationList(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def is_signature_valid(self, public_key: PUBLIC_KEY_TYPES) -> bool:
+    def is_signature_valid(
+        self, public_key: CERTIFICATE_ISSUER_PUBLIC_KEY_TYPES
+    ) -> bool:
         """
         Verifies signature of revocation list against given public key.
         """
@@ -438,19 +427,13 @@ class CertificateSigningRequest(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def __ne__(self, other: object) -> bool:
-        """
-        Checks not equal.
-        """
-
-    @abc.abstractmethod
     def __hash__(self) -> int:
         """
         Computes a hash.
         """
 
     @abc.abstractmethod
-    def public_key(self) -> PUBLIC_KEY_TYPES:
+    def public_key(self) -> CERTIFICATE_PUBLIC_KEY_TYPES:
         """
         Returns the public key
         """
@@ -566,12 +549,14 @@ def load_der_x509_crl(
     return rust_x509.load_der_x509_crl(data)
 
 
-class CertificateSigningRequestBuilder(object):
+class CertificateSigningRequestBuilder:
     def __init__(
         self,
         subject_name: typing.Optional[Name] = None,
         extensions: typing.List[Extension[ExtensionType]] = [],
-        attributes: typing.List[typing.Tuple[ObjectIdentifier, bytes]] = [],
+        attributes: typing.List[
+            typing.Tuple[ObjectIdentifier, bytes, typing.Optional[int]]
+        ] = [],
     ):
         """
         Creates an empty X.509 certificate request (v1).
@@ -611,7 +596,11 @@ class CertificateSigningRequestBuilder(object):
         )
 
     def add_attribute(
-        self, oid: ObjectIdentifier, value: bytes
+        self,
+        oid: ObjectIdentifier,
+        value: bytes,
+        *,
+        _tag: typing.Optional[_ASN1Type] = None,
     ) -> "CertificateSigningRequestBuilder":
         """
         Adds an X.509 attribute with an OID and associated value.
@@ -622,17 +611,25 @@ class CertificateSigningRequestBuilder(object):
         if not isinstance(value, bytes):
             raise TypeError("value must be bytes")
 
+        if _tag is not None and not isinstance(_tag, _ASN1Type):
+            raise TypeError("tag must be _ASN1Type")
+
         _reject_duplicate_attribute(oid, self._attributes)
+
+        if _tag is not None:
+            tag = _tag.value
+        else:
+            tag = None
 
         return CertificateSigningRequestBuilder(
             self._subject_name,
             self._extensions,
-            self._attributes + [(oid, value)],
+            self._attributes + [(oid, value, tag)],
         )
 
     def sign(
         self,
-        private_key: PRIVATE_KEY_TYPES,
+        private_key: CERTIFICATE_PRIVATE_KEY_TYPES,
         algorithm: typing.Optional[hashes.HashAlgorithm],
         backend: typing.Any = None,
     ) -> CertificateSigningRequest:
@@ -644,7 +641,7 @@ class CertificateSigningRequestBuilder(object):
         return rust_x509.create_x509_csr(self, private_key, algorithm)
 
 
-class CertificateBuilder(object):
+class CertificateBuilder:
     _extensions: typing.List[Extension[ExtensionType]]
 
     def __init__(
@@ -853,7 +850,7 @@ class CertificateBuilder(object):
 
     def sign(
         self,
-        private_key: PRIVATE_KEY_TYPES,
+        private_key: CERTIFICATE_PRIVATE_KEY_TYPES,
         algorithm: typing.Optional[hashes.HashAlgorithm],
         backend: typing.Any = None,
     ) -> Certificate:
@@ -881,7 +878,7 @@ class CertificateBuilder(object):
         return rust_x509.create_x509_certificate(self, private_key, algorithm)
 
 
-class CertificateRevocationListBuilder(object):
+class CertificateRevocationListBuilder:
     _extensions: typing.List[Extension[ExtensionType]]
     _revoked_certificates: typing.List[RevokedCertificate]
 
@@ -1000,7 +997,7 @@ class CertificateRevocationListBuilder(object):
 
     def sign(
         self,
-        private_key: PRIVATE_KEY_TYPES,
+        private_key: CERTIFICATE_PRIVATE_KEY_TYPES,
         algorithm: typing.Optional[hashes.HashAlgorithm],
         backend: typing.Any = None,
     ) -> CertificateRevocationList:
@@ -1016,7 +1013,7 @@ class CertificateRevocationListBuilder(object):
         return rust_x509.create_x509_crl(self, private_key, algorithm)
 
 
-class RevokedCertificateBuilder(object):
+class RevokedCertificateBuilder:
     def __init__(
         self,
         serial_number: typing.Optional[int] = None,

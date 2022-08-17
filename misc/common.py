@@ -1,5 +1,5 @@
 import sys
-sys.path.append('packages')
+#sys.path.append('packages')
 
 import requests
 from requests_pkcs12 import Pkcs12Adapter

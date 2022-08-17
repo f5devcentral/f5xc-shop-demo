@@ -1,9 +1,15 @@
 # coding:utf-8
 
 import itertools
+from typing import Any, Callable, Generator, Iterable, Optional, Union
 
 
-def expo(base=2, factor=1, max_value=None):
+def expo(
+    base: int = 2,
+    factor: int = 1,
+    max_value: Optional[int] = None
+) -> Generator[int, Any, None]:
+
     """Generator for exponential decay.
 
     Args:
@@ -13,6 +19,8 @@ def expo(base=2, factor=1, max_value=None):
              true exponential sequence exceeds this, the value
              of max_value will forever after be yielded.
     """
+    # Advance past initial .send() call
+    yield  # type: ignore[misc]
     n = 0
     while True:
         a = factor * base ** n
@@ -23,7 +31,7 @@ def expo(base=2, factor=1, max_value=None):
             yield max_value
 
 
-def fibo(max_value=None):
+def fibo(max_value: Optional[int] = None) -> Generator[int, None, None]:
     """Generator for fibonaccial decay.
 
     Args:
@@ -31,6 +39,9 @@ def fibo(max_value=None):
              true fibonacci sequence exceeds this, the value
              of max_value will forever after be yielded.
     """
+    # Advance past initial .send() call
+    yield  # type: ignore[misc]
+
     a = 1
     b = 1
     while True:
@@ -41,16 +52,35 @@ def fibo(max_value=None):
             yield max_value
 
 
-def constant(interval=1):
+def constant(
+    interval: Union[int, Iterable[int]] = 1
+) -> Generator[int, None, None]:
     """Generator for constant intervals.
 
     Args:
         interval: A constant value to yield or an iterable of such values.
     """
+    # Advance past initial .send() call
+    yield  # type: ignore[misc]
+
     try:
-        itr = iter(interval)
+        itr = iter(interval)  # type: ignore
     except TypeError:
-        itr = itertools.repeat(interval)
+        itr = itertools.repeat(interval)  # type: ignore
 
     for val in itr:
         yield val
+
+
+def runtime(*, value: Callable[[Any], int]) -> Generator[int, None, None]:
+    """Generator that is based on parsing the return value or thrown
+        exception of the decorated method
+
+    Args:
+        value: a callable which takes as input the decorated
+            function's return value or thrown exception and
+            determines how long to wait
+    """
+    ret_or_exc = yield  # type: ignore[misc]
+    while True:
+        ret_or_exc = yield value(ret_or_exc)
