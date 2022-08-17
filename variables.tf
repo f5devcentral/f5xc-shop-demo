@@ -40,7 +40,6 @@ variable "registry_config_json" {
 }
 
 variable "enable_bot_defense" {
-  type    = bool
   default = True
 }
 
