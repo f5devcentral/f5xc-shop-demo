@@ -33,7 +33,7 @@ Please refer to the [F5 DevCentral Community Code of Conduct](code_of_conduct.md
 [Apache License 2.0](LICENSE)
 
 ## Copyright
-Copyright 2014-2020 F5 Networks Inc.
+Copyright 2014-2022 F5 Networks Inc.
 
 
 ### F5 Networks Contributor License Agreement
