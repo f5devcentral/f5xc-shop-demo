@@ -13,8 +13,10 @@ This allows the demonstration of key F5xc Console concept such as:
 - traffic and application vizualizations
 - HTTP request telemetry
 - event monitoring
-- WAAP and bot protection
-- virtual kubernetes (vk8s) and edge workloads
+- WAAP
+- Bot Protection
+- Clientside defense
+- Virtual kubernetes (vk8s) and edge workloads
 
 ## Getting Started
 You may clone this repo, provide your own _tfvars_ an deploy in any F5xc tenant. Deploys for F5xc sales demos tenants are done through Terraform Cloud.
