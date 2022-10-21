@@ -1,10 +1,3 @@
-data "template_file" "nginx_conf" {
-  template = "${file("${path.module}/../../misc/nginx_conf.tpl")}"
-  vars = {
-    tenant_js_ref  = var.tenant_js_ref
-  }
-}
-
 resource "kubernetes_config_map_v1" "nginx_conf" {
   metadata {
     name = "nginx-conf"
@@ -14,7 +7,9 @@ resource "kubernetes_config_map_v1" "nginx_conf" {
     }
   }
   data = {
-    "default.conf" = data.template_file.nginx_conf.rendered
+    "default.conf" = templatefile("./misc/nginx_conf.tpl", {
+      enable_client_side_defense = var.enable_client_side_defense
+    })
   }
 }
 
@@ -27,7 +22,7 @@ resource "kubernetes_config_map_v1" "error_html" {
     }
   }
   data = {
-    "error.html" = file("${path.module}/../../misc/error.html")
+    "error.html" = file("./misc/error.html")
   }
 }
 

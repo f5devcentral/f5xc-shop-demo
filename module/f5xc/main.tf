@@ -2,7 +2,7 @@ terraform {
   required_providers {
     volterra = {
       source = "volterraedge/volterra"
-      version = "0.11.13"
+      version = "0.11.14"
     }
   }
 }
@@ -11,11 +11,10 @@ resource "volterra_namespace" "app_ns" {
   name = var.base
 
   provisioner "local-exec" {
-    command     = "./f5xc_resource_ready --type ns --name ${self.name}"
-    working_dir = "${path.module}/../../misc/dist/f5xc_resource_ready"   
+    command = "./misc/f5xc_resource_ready.py --type ns --name ${self.name} --timeout 30"
     environment = {
       VES_API_URL = var.api_url
-      VES_P12     = var.api_p12_file
+      VES_P12     = format("creds/%s", var.api_p12_file)
     }
   }
 }
@@ -24,11 +23,10 @@ resource "volterra_namespace" "utility_ns" {
   name = format("%s-utility", var.base)
 
   provisioner "local-exec" {
-    command     = "./f5xc_resource_ready --type ns --name ${self.name}"
-    working_dir = "${path.module}/../../misc/dist/f5xc_resource_ready"   
+    command = "./misc/f5xc_resource_ready.py --type ns --name ${self.name} --timeout 30"
     environment = {
       VES_API_URL = var.api_url
-      VES_P12     = var.api_p12_file
+      VES_P12     = format("creds/%s", var.api_p12_file)
     }
   }
 }
@@ -77,14 +75,11 @@ resource "volterra_virtual_k8s" "app_vk8s" {
     namespace = volterra_namespace.app_ns.name
   }
 
-  /* Workaround due to: 
-  https://github.com/volterraedge/terraform-provider-volterra/issues/54 */
   provisioner "local-exec" {
-    command     = "./f5xc_resource_ready --type vk8s --name ${self.name} --ns ${self.namespace}"
-    working_dir = "${path.module}/../../misc/dist/f5xc_resource_ready"    
+    command = "./misc/f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace} --timeout 300"
     environment = {
       VES_API_URL = var.api_url
-      VES_P12     = var.api_p12_file
+      VES_P12     = format("creds/%s", var.api_p12_file)
     }
   }
 }
@@ -99,11 +94,10 @@ resource "volterra_virtual_k8s" "utility_vk8s" {
   }
 
   provisioner "local-exec" {
-    command = "./f5xc_resource_ready --type vk8s --name ${self.name} --ns ${self.namespace}"
-    working_dir = "${path.module}/../../misc/dist/f5xc_resource_ready"   
+    command = "./misc/f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace} --timeout 300"
     environment = {
       VES_API_URL = var.api_url
-      VES_P12     = var.api_p12_file
+      VES_P12     = format("creds/%s", var.api_p12_file)
     }
   }
 }
@@ -319,7 +313,7 @@ resource "volterra_http_loadbalancer" "frontend" {
     namespace = volterra_namespace.app_ns.name
   }
   dynamic "bot_defense" {
-    for_each = var.enable_bot_defense ? [1] : [] //True
+    for_each = var.enable_bot_defense ? [1] : []
     content {
       policy {
         disable_js_insert       = false
@@ -333,7 +327,7 @@ resource "volterra_http_loadbalancer" "frontend" {
           }
           protocol = "https"
           web  = true
-          http_methods = ["POST"]
+          http_methods = ["METHOD_POST"]
           metadata {
             name = format("%s-bot-defense", var.base)
           }
@@ -349,7 +343,15 @@ resource "volterra_http_loadbalancer" "frontend" {
       timeout = 1000
       regional_endpoint = var.bot_defense_region
     }
-  } 
+  }
+  dynamic "client_side_defense" {
+    for_each = var.enable_client_side_defense ? [1] : []
+    content {
+      policy {
+        js_insert_all_pages = true
+      }
+    }
+  }
   user_identification {
     name      = volterra_user_identification.ui.name
     namespace = volterra_namespace.app_ns.name

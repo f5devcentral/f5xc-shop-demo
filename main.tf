@@ -3,7 +3,7 @@ terraform {
   required_providers {
     volterra = {
       source = "volterraedge/volterra"
-      version = "0.11.13"
+      version = "0.11.14"
     }
     kubernetes = {
       source = "hashicorp/kubernetes"
@@ -20,6 +20,7 @@ terraform {
 provider "volterra" {
   api_p12_file = "${path.root}/creds/${var.api_p12_file}"
   url          = var.api_url
+  timeout      = "120s"
 }
 
 provider "kubernetes" {
@@ -50,16 +51,18 @@ provider "kubectl" {
 module "f5xc" {
   source = "./module/f5xc"
 
-  api_url                 = var.api_url
-  api_p12_file            = "${path.module}/../../../creds/${var.api_p12_file}"
-  base                    = var.base
-  app_fqdn                = var.app_fqdn
-  spoke_site_selector     = var.spoke_site_selector
-  hub_site_selector       = var.hub_site_selector
-  utility_site_selector   = var.utility_site_selector
-  cred_expiry_days        = var.cred_expiry_days
-  enable_bot_defense      = var.enable_bot_defense
-  bot_defense_region      = var.bot_defense_region
+  api_url                    = var.api_url
+  api_p12_file               = "${path.module}/../creds/${var.api_p12_file}"
+  base                       = var.base
+  app_fqdn                   = var.app_fqdn
+  spoke_site_selector        = var.spoke_site_selector
+  hub_site_selector          = var.hub_site_selector
+  utility_site_selector      = var.utility_site_selector
+  cred_expiry_days           = var.cred_expiry_days
+  enable_bot_defense         = var.enable_bot_defense
+  bot_defense_region         = var.bot_defense_region
+  enable_synthetic_monitors  = var.enable_synthetic_monitors
+  enable_client_side_defense = var.enable_client_side_defense
 }
 
 module "vk8s-app" {
@@ -72,9 +75,9 @@ module "vk8s-app" {
   spoke_vsite   = module.f5xc.spoke_vsite
   hub_vsite     = module.f5xc.hub_vsite
 
-  registry_server       = var.registry_server
-  registry_config_json  = var.registry_config_json
-  tenant_js_ref         = var.tenant_js_ref
+  registry_server             = var.registry_server
+  registry_config_json        = var.registry_config_json
+  enable_client_side_defense  = var.enable_client_side_defense
 }
 
 module "vk8s-utility" {

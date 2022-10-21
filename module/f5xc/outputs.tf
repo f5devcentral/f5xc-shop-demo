@@ -81,3 +81,9 @@ output "app_kubecfg" {
   value       = volterra_api_credential.app_vk8s_cred.data
   sensitive   = true
 }
+
+output "utility_kubecfg" {
+  description = "utility kubeconfig"
+  value       = volterra_api_credential.utility_vk8s_cred.data
+  sensitive   = true
+}

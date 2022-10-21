@@ -39,14 +39,21 @@ variable "registry_config_json" {
   description = "registry config data string in type kubernetes.io/dockerconfigjson"
 }
 
+/*
+Optional Functionality
+*/
 variable "enable_bot_defense" {
-  default = true
+  default = false
 }
 
 variable "bot_defense_region" {
   default = "US"
 }
 
-variable "tenant_js_ref" {
-  default = "volt-f5_sales_demo_rljyvvmw-49301db1"
+variable "enable_synthetic_monitors" {
+  default = false
+}
+
+variable "enable_client_side_defense" {
+  default = false
 }
