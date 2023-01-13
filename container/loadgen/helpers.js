@@ -1,4 +1,5 @@
 import { SharedArray } from "k6/data";
+import { randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
 var agentHeaders = new SharedArray("all the agents", function() {
     var f = JSON.parse(open("./user-agents.json"));
@@ -25,4 +26,9 @@ export function addRandBotAgent() {
         headers: {'User-Agent': instance}
     }
     return crawlerHeader;
+}
+
+export function getCookieValue() {
+    const randomstring = randomString(8);
+    return `%7B%22diA%22%3A%22${randomstring}`;
 }

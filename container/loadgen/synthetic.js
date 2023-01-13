@@ -3,17 +3,31 @@ import { sleep, check } from 'k6';
 import {parseHTML} from "k6/html";
 import { addRandAgent } from './helpers.js';
 
-export function synthetic() {
+export function synthetic(cookieValue) {
     const base = `${__ENV.TARGET_URL}`
-    let res = http.get(base, addRandAgent());
-    const doc = parseHTML(res.body);
+    const jar = http.cookieJar();
+    jar.set(base, '_imp_apg_r_', cookieValue);
+    let res = http.get(base, addRandAgent()); //Get a session cookie
+    //const doc = parseHTML(res.body);
+    //console.log(doc)
     //Get a product
-    let products = doc.find("a").toArray()
-    products = products.filter(item => item.attr("href") !== "/cart")
-    var product = products[Math.floor(Math.random()*products.length)] || "/product/0PUK6V6EV0" //if we were blocked, use a dummy product
+    //let products = doc.find("a").toArray()
+    //products = products.filter(item => item.attr("href") !== "/cart")
+    //var product = products[Math.floor(Math.random()*products.length)] || "/product/0PUK6V6EV0" //if we were blocked, use a dummy product
     //Add to Cart
+    let products = [
+      "/product/OLJCESPC7Z",
+      "/product/66VCHSJNUP",
+      "/product/1YMWWN1N4O",
+      "/product/L9ECAV7KIM",
+      "/product/2ZYFJ3GM2N",
+      "/product/0PUK6V6EV0",
+      "/product/LS4PSXUNUM",
+      "/product/9SIQT8TOJO",
+      "/product/6E92ZMYYFZ"
+    ]
     let data = {
-      product_id: product.attr("href").split("/").pop(),
+      product_id: products[Math.floor(Math.random()*products.length)],
       quantity: 1
     };
     res = http.post(base.concat("/cart"), data, addRandAgent());
