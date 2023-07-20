@@ -10,9 +10,9 @@ resource "null_resource" "synthetic_monitor_http" {
         p12     = format("creds/%s", var.api_p12_file)
         data = jsonencode(
             {
+                "namespace" = volterra_namespace.app_ns.name
                 "metadata" = {
                     "name" = format("%s-http", var.base)
-                    "namespace" = volterra_namespace.app_ns.name
                     "description" = "shop demo http monitor"
                 }
                 "spec" = {
@@ -58,9 +58,9 @@ resource "null_resource" "synthetic_monitor_dns" {
         p12     = format("creds/%s", var.api_p12_file)
         data = jsonencode(
         {
+            "namespace" = volterra_namespace.app_ns.name
             "metadata" = {
                 "name" = format("%s-dns", var.base)
-                "namespace" = volterra_namespace.app_ns.name
                 "description" = "shop demo dns monitor"
             }
             "spec" = {
@@ -79,6 +79,7 @@ resource "null_resource" "synthetic_monitor_dns" {
         }
         )
     }
+
     provisioner "local-exec" {
         command = "./misc/f5xc_synth_mon.py --type dns --ns ${self.triggers.ns} --data '${self.triggers.data}'"
         environment = {
