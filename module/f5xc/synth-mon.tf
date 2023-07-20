@@ -26,7 +26,6 @@ resource "null_resource" "synthetic_monitor_http" {
                         {"aws" = {"regions" = ["us-east-2", "us-west-1", "eu-north-1", "ap-east-1"]}}
                     ]
                     "response_codes" = ["2**"]
-                    }
                 }
             }
         )
