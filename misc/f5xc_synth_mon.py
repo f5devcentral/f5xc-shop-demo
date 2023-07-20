@@ -12,8 +12,8 @@ def check_env_vars(args=['VES_API_URL', 'VES_P12', 'VES_P12_PASSWORD']):
 
 def find_url(type: str, namespace: str):
     res_map={
-        'http': '{0}/synthetic_monitor/namespaces/{1}/v1_http_monitors'.format(os.environ.get('VES_API_URL'), namespace),
-        'dns': '{0}/synthetic_monitor/namespaces/{1}/v1_dns_monitors'.format(os.environ.get('VES_API_URL'), namespace)
+        'http': '{0}/observability/synthetic_monitor/namespaces/{1}/v1_http_monitors'.format(os.environ.get('VES_API_URL'), namespace),
+        'dns': '{0}/observability/synthetic_monitor/namespaces/{1}/v1_dns_monitors'.format(os.environ.get('VES_API_URL'), namespace)
     }
     return res_map[type]
 
@@ -28,6 +28,7 @@ def create_monitor(type: str, namespace: str, payload: str):
             stdout=subprocess.PIPE,
             check=False
         )
+        print(res.stdout)
         json.loads(res.stdout)
         if res.stderr:
             raise Exception

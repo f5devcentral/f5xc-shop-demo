@@ -25,8 +25,7 @@ resource "null_resource" "synthetic_monitor_http" {
                     "external_sources" =  [
                         {"aws" = {"regions" = ["us-east-2", "us-west-1", "eu-north-1", "ap-east-1"]}}
                     ]
-                    "valid_response_codes" = {
-                        "valid_response_codes" = ["2**"]
+                    "response_codes" = ["2**"]
                     }
                 }
             }
